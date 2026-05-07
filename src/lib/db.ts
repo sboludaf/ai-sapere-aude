@@ -12,6 +12,7 @@ export function getPool() {
       database: process.env.MYSQL_DATABASE ?? "ai_sapere_aude",
       waitForConnections: true,
       connectionLimit: 10,
+      connectTimeout: 5000,
       namedPlaceholders: true,
       timezone: "Z",
       decimalNumbers: true,

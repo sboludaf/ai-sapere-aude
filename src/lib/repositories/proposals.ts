@@ -11,12 +11,6 @@ import {
   updateProposalClassSchema,
   updateStatusSchema
 } from "@/lib/validation";
-import {
-  demoProfessors,
-  demoProposalDetail,
-  demoProposalId,
-  demoProposals
-} from "@/lib/repositories/demo-data";
 import type {
   BudgetCategory,
   BudgetItem,
@@ -377,8 +371,14 @@ export async function listProposals(): Promise<ProposalSummary[]> {
 
     return rows.map(mapProposalSummary);
   } catch (error) {
-    console.warn("Using demo proposal data", error);
-    return demoProposals;
+    console.error("[listProposals] DB connection failed:", {
+      host: process.env.MYSQL_HOST,
+      port: process.env.MYSQL_PORT,
+      user: process.env.MYSQL_USER,
+      database: process.env.MYSQL_DATABASE,
+      error: error instanceof Error ? error.message : String(error)
+    });
+    return [];
   }
 }
 
@@ -565,8 +565,11 @@ export async function getProposal(id: string): Promise<ProposalDetail | null> {
       budgetVersions
     };
   } catch (error) {
-    console.warn("Using demo proposal detail", error);
-    return id === demoProposalId ? demoProposalDetail : null;
+    console.error("[getProposal] DB connection failed for id:", id, {
+      host: process.env.MYSQL_HOST,
+      error: error instanceof Error ? error.message : String(error)
+    });
+    return null;
   }
 }
 
@@ -826,8 +829,11 @@ export async function listProfessors(): Promise<Professor[]> {
       createdAt: toIsoString(professor.createdAt)
     }));
   } catch (error) {
-    console.warn("Using demo professor data", error);
-    return demoProfessors;
+    console.error("[listProfessors] DB connection failed:", {
+      host: process.env.MYSQL_HOST,
+      error: error instanceof Error ? error.message : String(error)
+    });
+    return [];
   }
 }
 
