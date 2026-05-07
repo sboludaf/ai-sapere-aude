@@ -26,7 +26,7 @@ export function NewProposalModal({ professors }: NewProposalModalProps) {
                 <Modal.Heading>Nueva propuesta</Modal.Heading>
               </Modal.Header>
               <Modal.Body>
-                <ProposalForm professors={professors} />
+                <ProposalForm professors={professors} onSuccess={state.close} />
               </Modal.Body>
             </Modal.Dialog>
           </Modal.Container>

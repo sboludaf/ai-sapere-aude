@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import {
   addProposalComment,
   createProfessor,
+  deleteProfessor,
   updateProposalClass,
   updateProposalBudget,
   updateProposalStatus
@@ -92,9 +93,16 @@ export async function createProfessorAction(formData: FormData) {
   await createProfessor({
     firstName: value(formData, "firstName"),
     lastName: value(formData, "lastName"),
-    email: value(formData, "email")
+    email: value(formData, "email"),
+    phone: value(formData, "phone") || undefined
   });
 
   revalidatePath("/professors");
   redirect("/professors");
+}
+
+export async function deleteProfessorAction(formData: FormData) {
+  const id = value(formData, "professorId");
+  await deleteProfessor(id);
+  revalidatePath("/professors");
 }

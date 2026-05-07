@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, GraduationCap, Mail } from "lucide-react";
-import { NewProfessorModal } from "@/components/new-professor-modal";
-import { initials } from "@/lib/format";
+import { ArrowLeft, Mail, Phone, Trash2 } from "lucide-react";
+import { AddProfessorDropdown } from "@/components/add-professor-dropdown";
+import { deleteProfessorAction } from "@/app/actions";
 import { listProfessors } from "@/lib/repositories/proposals";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export default async function ProfessorsPage() {
           <span className="eyebrow">AI Sapere Aude</span>
           <h1>Profesores</h1>
         </div>
-        <NewProfessorModal />
+        <AddProfessorDropdown />
       </header>
 
       <section className="panel">
@@ -30,27 +30,37 @@ export default async function ProfessorsPage() {
         </div>
 
         <div className="professor-grid">
-          {professors.map((professor) => {
-            const fullName = `${professor.firstName} ${professor.lastName}`;
-
-            return (
-              <article className="professor-card" key={professor.id}>
-                <header>
-                  <span className="avatar">{initials(fullName)}</span>
-                  <GraduationCap size={20} aria-hidden="true" />
-                </header>
-                <div>
-                  <h3>{fullName}</h3>
-                  <p className="proposal-meta">
-                    <span>
-                      <Mail size={14} aria-hidden="true" />
-                      {professor.email}
-                    </span>
+          {professors.map((professor) => (
+            <article className="professor-card" key={professor.id}>
+              <div className="professor-info">
+                <h3 className="professor-name">
+                  <span className="professor-first-name">{professor.firstName}</span>
+                  <span className="professor-last-name">{professor.lastName}</span>
+                </h3>
+                <p className="professor-email">
+                  <Mail size={13} aria-hidden="true" />
+                  {professor.email}
+                </p>
+                {professor.phone ? (
+                  <p className="professor-email">
+                    <Phone size={13} aria-hidden="true" />
+                    {professor.phone}
                   </p>
-                </div>
-              </article>
-            );
-          })}
+                ) : null}
+              </div>
+              <form action={deleteProfessorAction}>
+                <input type="hidden" name="professorId" value={professor.id} />
+                <button
+                  type="submit"
+                  className="delete-professor-button"
+                  aria-label={`Eliminar ${professor.firstName} ${professor.lastName}`}
+                  title="Eliminar profesor"
+                >
+                  <Trash2 size={15} aria-hidden="true" />
+                </button>
+              </form>
+            </article>
+          ))}
         </div>
       </section>
     </div>

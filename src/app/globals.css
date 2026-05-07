@@ -650,7 +650,7 @@ label {
 input,
 select,
 textarea {
-  background: #0f1115;
+  background: var(--surface-soft);
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--ink);
@@ -840,7 +840,9 @@ td {
   border-radius: 999px !important;
   color: var(--muted) !important;
   display: inline-flex !important;
+  flex-shrink: 0 !important;
   height: 30px !important;
+  justify-content: center !important;
   min-height: 30px !important;
   min-width: 30px !important;
   padding: 0 !important;
@@ -880,8 +882,7 @@ td {
 }
 
 .timeline-item,
-.comment-item,
-.professor-card {
+.comment-item {
   display: grid;
   gap: 8px;
   padding: 14px;
@@ -929,10 +930,112 @@ td {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.professor-card header {
-  align-items: center;
+.professor-card {
+  align-items: flex-start;
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+}
+
+.professor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.professor-name {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1.2;
+}
+
+.professor-first-name {
+  color: var(--primary);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.professor-last-name {
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.professor-email {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 0.78rem;
+  gap: 5px;
+  margin: 0;
+}
+
+.delete-professor-button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 30px;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.15s ease;
+  width: 30px;
+}
+
+.delete-professor-button:hover {
+  background: rgba(255, 139, 128, 0.12);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.dropdown-wrapper {
+  position: relative;
+}
+
+.dropdown-panel {
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 360px;
+  z-index: 100;
+}
+
+.dropdown-form {
+  display: grid;
+  gap: 10px;
+}
+
+.dropdown-form-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.dropdown-form label {
+  color: var(--muted);
+  display: grid;
+  font-size: 0.8rem;
+  gap: 4px;
+}
+
+.dropdown-form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 4px;
 }
 
 .empty-state {

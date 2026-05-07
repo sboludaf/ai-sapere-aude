@@ -63,7 +63,8 @@ export const updateBudgetSchema = z.object({
 export const createProfessorSchema = z.object({
   firstName: z.string().trim().min(1, "Nombre obligatorio"),
   lastName: z.string().trim().min(1, "Apellidos obligatorios"),
-  email: z.string().trim().email("Correo no valido")
+  email: z.string().trim().email("Correo no valido"),
+  phone: z.preprocess(emptyToUndefined, z.string().trim().optional())
 });
 
 export const updateProposalClassSchema = z.object({

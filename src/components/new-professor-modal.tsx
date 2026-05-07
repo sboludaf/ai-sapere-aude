@@ -1,12 +1,11 @@
 "use client";
 
 import { useTransition, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { Button, Input, Modal, useOverlayState } from "@heroui/react";
 import { UserPlus } from "lucide-react";
+import { createProfessorAction } from "@/app/actions";
 
 export function NewProfessorModal() {
-  const router = useRouter();
   const state = useOverlayState();
   const [isPending, startTransition] = useTransition();
 
@@ -14,25 +13,12 @@ export function NewProfessorModal() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const response = await fetch("/api/professors", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        firstName: String(formData.get("firstName") ?? ""),
-        lastName: String(formData.get("lastName") ?? ""),
-        email: String(formData.get("email") ?? "")
-      })
-    });
 
-    if (response.ok) {
+    startTransition(async () => {
+      await createProfessorAction(formData);
       form.reset();
-      startTransition(() => {
-        state.close();
-        router.refresh();
-      });
-    }
+      state.close();
+    });
   }
 
   return (

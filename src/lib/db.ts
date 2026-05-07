@@ -11,8 +11,11 @@ export function getPool() {
       password: process.env.MYSQL_PASSWORD ?? "ai_sapere_password",
       database: process.env.MYSQL_DATABASE ?? "ai_sapere_aude",
       waitForConnections: true,
-      connectionLimit: 10,
+      connectionLimit: 20,
+      queueLimit: 0,
       connectTimeout: 5000,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0,
       namedPlaceholders: true,
       timezone: "Z",
       decimalNumbers: true,
@@ -21,6 +24,13 @@ export function getPool() {
   }
 
   return pool;
+}
+
+export async function resetPool() {
+  if (pool) {
+    await pool.end();
+    pool = undefined;
+  }
 }
 
 export async function withTransaction<T>(callback: (connection: mysql.PoolConnection) => Promise<T>) {

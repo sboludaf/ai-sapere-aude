@@ -28,6 +28,7 @@ type ClassDraft = {
 
 type ProposalFormProps = {
   professors: Professor[];
+  onSuccess?: () => void;
 };
 
 const emptyBudgetItem: BudgetItemDraft = {
@@ -56,7 +57,7 @@ function calculateHours(startTime: string, endTime: string) {
   return Number((Math.max(end - start, 0) / 60).toFixed(2));
 }
 
-export function ProposalForm({ professors }: ProposalFormProps) {
+export function ProposalForm({ professors, onSuccess }: ProposalFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -123,7 +124,10 @@ export function ProposalForm({ professors }: ProposalFormProps) {
     }
 
     const result = (await response.json()) as { id: string };
-    startTransition(() => router.push(`/proposals/${result.id}`));
+    startTransition(() => {
+      onSuccess?.();
+      router.push(`/proposals/${result.id}`);
+    });
   }
 
   return (
@@ -200,7 +204,7 @@ export function ProposalForm({ professors }: ProposalFormProps) {
             <Input
               aria-label="Precio unitario"
               min="0"
-              step="50"
+              step="0.01"
               type="number"
               value={String(item.unitPrice)}
               onChange={(event) => updateBudgetItem(index, { unitPrice: Number(event.target.value) })}

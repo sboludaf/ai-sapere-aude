@@ -147,8 +147,9 @@ function mapProposalSummary(row: ProposalSummaryRow): ProposalSummary {
 }
 
 async function ignoreSchemaError(statement: string) {
+  const connection = await getPool().getConnection();
   try {
-    await getPool().query(statement);
+    await connection.query(statement);
   } catch (error) {
     if (
       typeof error === "object" &&
@@ -160,6 +161,8 @@ async function ignoreSchemaError(statement: string) {
     }
 
     console.warn("Schema migration step skipped", error);
+  } finally {
+    connection.release();
   }
 }
 
@@ -236,6 +239,7 @@ async function ensureApplicationSchema() {
       );
       await ignoreSchemaError("ALTER TABLE proposal_professor_assignments MODIFY professor_name VARCHAR(255) NULL");
       await ignoreSchemaError("ALTER TABLE budget_items ADD COLUMN persons DECIMAL(10,2) NOT NULL DEFAULT 1 AFTER quantity");
+      await ignoreSchemaError("ALTER TABLE professors ADD COLUMN phone VARCHAR(30) NULL AFTER email");
       await ignoreSchemaError("ALTER TABLE proposal_professor_assignments ADD COLUMN class_title VARCHAR(255) NOT NULL DEFAULT 'Clase' AFTER professor_id");
       await ignoreSchemaError("ALTER TABLE proposal_professor_assignments ADD COLUMN start_time TIME NULL AFTER session_date");
       await ignoreSchemaError("ALTER TABLE proposal_professor_assignments ADD COLUMN end_time TIME NULL AFTER start_time");
@@ -813,6 +817,7 @@ export async function listProfessors(): Promise<Professor[]> {
         first_name AS firstName,
         last_name AS lastName,
         email,
+        phone,
         active,
         created_at AS createdAt
       FROM professors
@@ -825,6 +830,7 @@ export async function listProfessors(): Promise<Professor[]> {
       firstName: professor.firstName,
       lastName: professor.lastName,
       email: professor.email,
+      phone: professor.phone ?? null,
       active: Boolean(professor.active),
       createdAt: toIsoString(professor.createdAt)
     }));
@@ -841,22 +847,28 @@ export async function createProfessor(input: {
   firstName: string;
   lastName: string;
   email: string;
+  phone?: string;
 }) {
   await ensureApplicationSchema();
   const parsed = createProfessorSchema.parse(input);
 
   await getPool().execute(
     `
-    INSERT INTO professors (id, first_name, last_name, email)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO professors (id, first_name, last_name, email, phone)
+    VALUES (?, ?, ?, ?, ?)
     ON DUPLICATE KEY UPDATE
       first_name = VALUES(first_name),
       last_name = VALUES(last_name),
+      phone = VALUES(phone),
       active = TRUE,
       updated_at = CURRENT_TIMESTAMP
     `,
-    [crypto.randomUUID(), parsed.firstName, parsed.lastName, parsed.email]
+    [crypto.randomUUID(), parsed.firstName, parsed.lastName, parsed.email, parsed.phone ?? null]
   );
+}
+
+export async function deleteProfessor(id: string) {
+  await getPool().execute("DELETE FROM professors WHERE id = ?", [id]);
 }
 
 async function buildProposalSnapshot(id: string): Promise<SyncProposalSnapshot | null> {

@@ -154,7 +154,7 @@ export function BudgetUpdateForm({ proposalId, currency, latestItems, onSaved }:
           <Input
             aria-label="Precio unitario"
             min="0"
-            step="50"
+            step="0.01"
             type="number"
             value={String(item.unitPrice)}
             onChange={(event) => updateItem(index, { unitPrice: Number(event.target.value) })}
