@@ -749,10 +749,11 @@ export async function updateProposalClass(input: UpdateProposalClassInput) {
   await getPool().execute(
     `
     UPDATE proposal_professor_assignments
-    SET professor_id = ?, professor_name = ?, class_status = ?
+    SET professor_id = ?, professor_name = ?, class_status = ?,
+        class_title = COALESCE(?, class_title)
     WHERE id = ? AND proposal_id = ?
     `,
-    [parsed.professorId || null, professorName, parsed.classStatus, parsed.classId, parsed.proposalId]
+    [parsed.professorId || null, professorName, parsed.classStatus, parsed.title ?? null, parsed.classId, parsed.proposalId]
   );
 
   await syncProposalById(parsed.proposalId);

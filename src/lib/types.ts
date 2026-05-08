@@ -123,6 +123,7 @@ export type UpdateBudgetInput = {
 export type UpdateProposalClassInput = {
   proposalId: string;
   classId: string;
+  title?: string;
   professorId?: string;
   classStatus: ClassStatus;
 };

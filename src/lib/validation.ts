@@ -80,6 +80,7 @@ export const updateProfessorSchema = z.object({
 export const updateProposalClassSchema = z.object({
   proposalId: z.string().uuid(),
   classId: z.string().uuid(),
+  title: z.preprocess(emptyToUndefined, z.string().trim().min(1, "Titulo obligatorio").optional()),
   professorId: z.preprocess(emptyToUndefined, z.string().trim().optional()),
   classStatus: z.enum(classStatuses)
 });

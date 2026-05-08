@@ -1105,6 +1105,15 @@ td {
   min-width: 0;
 }
 
+.title-editor {
+  gap: 4px;
+  justify-content: flex-start;
+}
+
+.title-editor input {
+  min-width: 160px;
+}
+
 .edit-button {
   align-items: center !important;
   background: var(--surface-soft) !important;
