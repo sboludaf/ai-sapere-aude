@@ -9,7 +9,7 @@ const statusLabels: Record<ProposalStatus, string> = {
 };
 
 const classStatusLabels: Record<ClassStatus, string> = {
-  SEARCHING_PROFESSOR: "Busqueda Profesor",
+  SEARCHING_PROFESSOR: "Busqueda de Profesor",
   PENDING_CONFIRMATION: "Pendiente Confirmacion",
   PENDING_PRESENTATION_REVIEW: "Pendiente Revision Presentacion",
   PRESENTATION_OK: "OK a Presentacion"

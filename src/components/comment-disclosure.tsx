@@ -4,6 +4,7 @@ import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, TextArea } from "@heroui/react";
 import { MessageSquare } from "lucide-react";
+import { AppSelect } from "@/components/app-controls";
 import { proposalResponsibles } from "@/lib/types";
 
 type CommentDisclosureProps = {
@@ -15,6 +16,8 @@ export function CommentDisclosure({ proposalId }: CommentDisclosureProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [authorName, setAuthorName] = useState<string>(proposalResponsibles[0]);
+  const [category, setCategory] = useState("GENERAL");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,21 +59,27 @@ export function CommentDisclosure({ proposalId }: CommentDisclosureProps) {
           <div className="form-grid two">
             <label>
               Autor
-              <select name="authorName" defaultValue={proposalResponsibles[0]}>
-                {proposalResponsibles.map((responsible) => (
-                  <option key={responsible} value={responsible}>
-                    {responsible}
-                  </option>
-                ))}
-              </select>
+              <AppSelect
+                ariaLabel="Autor"
+                name="authorName"
+                onChange={setAuthorName}
+                options={proposalResponsibles.map((responsible) => ({ key: responsible, label: responsible }))}
+                value={authorName}
+              />
             </label>
             <label>
               Categoria
-              <select name="category" defaultValue="GENERAL">
-                <option value="GENERAL">General</option>
-                <option value="CONTENT">Contenido</option>
-                <option value="BUDGET">Presupuesto</option>
-              </select>
+              <AppSelect
+                ariaLabel="Categoria"
+                name="category"
+                onChange={setCategory}
+                options={[
+                  { key: "GENERAL", label: "General" },
+                  { key: "CONTENT", label: "Contenido" },
+                  { key: "BUDGET", label: "Presupuesto" }
+                ]}
+                value={category}
+              />
             </label>
           </div>
           <label>

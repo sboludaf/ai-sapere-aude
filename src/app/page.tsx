@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { Plus, UsersRound } from "lucide-react";
+import { UsersRound } from "lucide-react";
+import { NewProposalModal } from "@/components/new-proposal-modal";
 import { ProposalsDashboard } from "@/components/proposals-dashboard";
-import { listProposals } from "@/lib/repositories/proposals";
+import { listProfessors, listProposals } from "@/lib/repositories/proposals";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const proposals = await listProposals();
+  const [proposals, professors] = await Promise.all([listProposals(), listProfessors()]);
 
   return (
     <div className="page">
@@ -20,10 +21,7 @@ export default async function HomePage() {
             <UsersRound size={18} aria-hidden="true" />
             Profesores
           </Link>
-          <Link className="brand-button" href="/proposals/new">
-            <Plus size={18} aria-hidden="true" />
-            Nueva propuesta
-          </Link>
+          <NewProposalModal professors={professors} />
         </div>
       </header>
 

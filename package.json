@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@internationalized/date": "^3.12.1",
     "@heroui/react": "^3.0.3",
     "@qdrant/js-client-rest": "^1.13.0",
     "framer-motion": "^12.38.0",

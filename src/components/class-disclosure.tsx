@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input, TextArea } from "@heroui/react";
 import { CalendarPlus } from "lucide-react";
+import { AppDatePicker, AppTimeField } from "@/components/app-controls";
 import { formatHours } from "@/lib/format";
 
 type ClassDisclosureProps = {
@@ -24,6 +25,7 @@ export function ClassDisclosure({ proposalId }: ClassDisclosureProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [classDate, setClassDate] = useState("");
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("13:00");
   const hours = useMemo(() => calculateHours(startTime, endTime), [startTime, endTime]);
@@ -33,6 +35,12 @@ export function ClassDisclosure({ proposalId }: ClassDisclosureProps) {
     setError(null);
     const form = event.currentTarget;
     const formData = new FormData(form);
+
+    if (!classDate) {
+      setError("Selecciona la fecha de la clase.");
+      return;
+    }
+
     const response = await fetch(`/api/proposals/${proposalId}/classes`, {
       method: "POST",
       headers: {
@@ -40,7 +48,7 @@ export function ClassDisclosure({ proposalId }: ClassDisclosureProps) {
       },
       body: JSON.stringify({
         title: String(formData.get("title") ?? ""),
-        classDate: String(formData.get("classDate") ?? ""),
+        classDate,
         startTime,
         endTime,
         hours,
@@ -54,6 +62,7 @@ export function ClassDisclosure({ proposalId }: ClassDisclosureProps) {
     }
 
     form.reset();
+    setClassDate("");
     setStartTime("09:00");
     setEndTime("13:00");
     startTransition(() => {
@@ -77,7 +86,7 @@ export function ClassDisclosure({ proposalId }: ClassDisclosureProps) {
           <div className="form-grid two">
             <label>
               Fecha
-              <Input name="classDate" type="date" required />
+              <AppDatePicker ariaLabel="Fecha de la clase" onChange={setClassDate} required value={classDate} />
             </label>
             <label>
               Sumatorio de horas
@@ -87,11 +96,11 @@ export function ClassDisclosure({ proposalId }: ClassDisclosureProps) {
           <div className="form-grid two">
             <label>
               Hora inicio
-              <Input type="time" value={startTime} onChange={(event) => setStartTime(event.target.value)} required />
+              <AppTimeField ariaLabel="Hora inicio" onChange={setStartTime} required value={startTime} />
             </label>
             <label>
               Hora fin
-              <Input type="time" value={endTime} onChange={(event) => setEndTime(event.target.value)} required />
+              <AppTimeField ariaLabel="Hora fin" onChange={setEndTime} required value={endTime} />
             </label>
           </div>
           <label>

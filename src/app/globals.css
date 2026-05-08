@@ -567,7 +567,7 @@ h3 {
 }
 
 .disclosure-panel {
-  background: var(--surface);
+  background: var(--surface-soft);
   border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow: 0 22px 70px rgba(17, 19, 24, 0.15);
@@ -639,6 +639,14 @@ h3 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.compact-fields {
+  align-items: start;
+}
+
+.compact-fields label {
+  align-content: start;
+}
+
 label {
   color: var(--muted);
   display: grid;
@@ -647,16 +655,280 @@ label {
   font-weight: 700;
 }
 
+.app-select,
+.app-date-picker,
+.app-time-field,
+.app-number-field {
+  width: 100%;
+}
+
+.app-select-trigger,
+.app-date-group,
+.app-number-group {
+  align-items: center;
+  background: var(--app-bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  display: flex;
+  height: 42px;
+  max-height: 42px;
+  min-height: 42px;
+  width: 100%;
+}
+
+.app-select-trigger {
+  gap: 10px;
+  height: 42px !important;
+  justify-content: space-between;
+  max-height: 42px;
+  min-height: 42px !important;
+  padding: 0 11px;
+}
+
+.app-select-value {
+  align-items: center;
+  display: inline-flex;
+  flex: 1;
+  line-height: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-select-trigger:focus-visible,
+.app-date-group:focus-within,
+.app-number-group:focus-within {
+  border-color: var(--primary-strong);
+  box-shadow: 0 0 0 3px rgba(150, 233, 206, 0.28);
+  outline: none;
+}
+
+.app-select-popover,
+.app-date-popover {
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  min-width: 220px;
+  padding: 8px;
+  z-index: 60;
+}
+
+.app-select-listbox {
+  display: grid;
+  gap: 4px;
+}
+
+.app-select-item {
+  align-items: center;
+  background: var(--app-bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 8px 10px;
+}
+
+.app-select-item:hover,
+.app-select-item[data-focused],
+.app-select-item[data-selected] {
+  background: rgba(150, 233, 206, 0.13);
+  border-color: rgba(150, 233, 206, 0.34);
+}
+
+.class-status-searching {
+  --class-status-bg: rgba(255, 139, 128, 0.15);
+  --class-status-border: rgba(255, 139, 128, 0.4);
+  --class-status-text: #ffb0a8;
+}
+
+.class-status-confirmation {
+  --class-status-bg: rgba(247, 199, 106, 0.16);
+  --class-status-border: rgba(247, 199, 106, 0.42);
+  --class-status-text: #f7d98f;
+}
+
+.class-status-review {
+  --class-status-bg: rgba(219, 200, 255, 0.17);
+  --class-status-border: rgba(219, 200, 255, 0.42);
+  --class-status-text: #dbc8ff;
+}
+
+.class-status-ok {
+  --class-status-bg: rgba(150, 233, 206, 0.18);
+  --class-status-border: rgba(150, 233, 206, 0.48);
+  --class-status-text: var(--primary);
+}
+
+.class-status-badge,
+.app-select-trigger[class*="class-status-"],
+.app-select-item[class*="class-status-"] {
+  background: var(--class-status-bg);
+  border-color: var(--class-status-border);
+  color: var(--class-status-text);
+}
+
+.class-status-badge {
+  align-items: center;
+  border: 1px solid var(--class-status-border);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  min-height: 30px;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+.app-select-item[class*="class-status-"]:hover,
+.app-select-item[class*="class-status-"][data-focused],
+.app-select-item[class*="class-status-"][data-selected] {
+  background: var(--class-status-bg);
+  border-color: var(--class-status-text);
+}
+
+.app-date-input {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+  padding: 0 10px;
+}
+
+.app-field-icon-button,
+.app-calendar-nav,
+.app-number-stepper {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  display: inline-flex;
+  justify-content: center;
+}
+
+.app-field-icon-button {
+  border-left: 1px solid var(--line);
+  min-height: 40px;
+  width: 40px;
+}
+
+.app-field-icon-button:hover,
+.app-calendar-nav:hover,
+.app-number-stepper:hover {
+  color: var(--primary);
+}
+
+.app-time-field .app-date-input {
+  min-height: 40px;
+}
+
+.app-number-group {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  overflow: hidden;
+}
+
+.app-number-input {
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-radius: 0;
+  border-right: 1px solid var(--line);
+  color: var(--ink);
+  min-height: 40px;
+  padding: 0 8px;
+  text-align: center;
+  width: 100%;
+}
+
+.app-number-input:focus {
+  box-shadow: none;
+}
+
+.app-number-stepper {
+  min-height: 40px;
+  padding: 0;
+}
+
+.app-calendar {
+  display: grid;
+  gap: 10px;
+}
+
+.app-calendar-header {
+  align-items: center;
+  display: flex;
+  font-weight: 800;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.app-calendar-nav {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  height: 30px;
+  width: 30px;
+}
+
+.app-calendar-grid {
+  border-collapse: separate;
+  border-spacing: 4px;
+  min-width: 260px;
+}
+
+.app-calendar-header-cell {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.app-calendar-cell {
+  background: var(--app-bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  height: 34px;
+  text-align: center;
+  width: 34px;
+}
+
+.app-calendar-cell:hover,
+.app-calendar-cell[data-focused] {
+  background: rgba(150, 233, 206, 0.14);
+}
+
+.app-calendar-cell[data-selected] {
+  background: var(--primary);
+  color: var(--button-ink);
+  font-weight: 900;
+}
+
 input,
 select,
 textarea {
-  background: var(--surface-soft);
+  background: var(--app-bg);
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--ink);
   min-height: 42px;
   padding: 10px 11px;
   width: 100%;
+}
+
+input:not([type="hidden"]),
+select {
+  height: 42px;
+  max-height: 42px;
 }
 
 textarea {
@@ -948,8 +1220,10 @@ td {
 
 .professor-name {
   display: flex;
-  flex-direction: column;
-  gap: 0;
+  align-items: baseline;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
   line-height: 1.2;
 }
 
@@ -976,28 +1250,38 @@ td {
 
 .delete-professor-button {
   align-items: center;
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--muted);
+  background: transparent !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 999px !important;
+  color: var(--muted) !important;
   cursor: pointer;
-  display: inline-flex;
+  display: inline-flex !important;
   flex-shrink: 0;
-  height: 30px;
+  height: 30px !important;
   justify-content: center;
-  padding: 0;
+  min-height: 30px !important;
+  min-width: 30px !important;
+  padding: 0 !important;
   transition: all 0.15s ease;
-  width: 30px;
+  width: 30px !important;
 }
 
 .delete-professor-button:hover {
-  background: rgba(255, 139, 128, 0.12);
-  border-color: var(--danger);
-  color: var(--danger);
+  background: rgba(255, 139, 128, 0.12) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
 }
 
 .dropdown-wrapper {
   position: relative;
+}
+
+.dropdown-trigger-icon {
+  transition: transform 0.16s ease;
+}
+
+.dropdown-trigger-icon.open {
+  transform: rotate(180deg);
 }
 
 .dropdown-panel {
@@ -1011,6 +1295,10 @@ td {
   top: calc(100% + 8px);
   width: 360px;
   z-index: 100;
+}
+
+.professor-dropdown-panel {
+  width: min(420px, calc(100vw - 64px));
 }
 
 .dropdown-form {

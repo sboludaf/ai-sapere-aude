@@ -1,67 +1,54 @@
 "use client";
 
-import { useTransition, type FormEvent } from "react";
-import { Button, Input, Modal, useOverlayState } from "@heroui/react";
-import { UserPlus } from "lucide-react";
+import { useState, useTransition } from "react";
+import { Button, Input } from "@heroui/react";
+import { ChevronDown, UserPlus } from "lucide-react";
 import { createProfessorAction } from "@/app/actions";
 
 export function NewProfessorModal() {
-  const state = useOverlayState();
+  const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-
+  function submit(formData: FormData) {
     startTransition(async () => {
       await createProfessorAction(formData);
-      form.reset();
-      state.close();
+      setIsOpen(false);
     });
   }
 
   return (
-    <>
-      <Button className="brand-button" onPress={state.open}>
+    <div className="dropdown-wrapper">
+      <Button className="brand-button" onPress={() => setIsOpen((current) => !current)}>
         <UserPlus size={18} aria-hidden="true" />
         Nuevo profesor
+        <ChevronDown className={isOpen ? "dropdown-trigger-icon open" : "dropdown-trigger-icon"} size={16} aria-hidden="true" />
       </Button>
-      <Modal state={state}>
-        <Modal.Backdrop>
-          <Modal.Container size="lg" placement="center">
-            <Modal.Dialog>
-              <Modal.Header>
-                <Modal.Heading>Nuevo profesor</Modal.Heading>
-              </Modal.Header>
-              <Modal.Body>
-                <form className="stacked-form" onSubmit={submit}>
-                  <div className="form-grid two">
-                    <label>
-                      Nombre
-                      <Input name="firstName" required />
-                    </label>
-                    <label>
-                      Apellidos
-                      <Input name="lastName" required />
-                    </label>
-                  </div>
-                  <label>
-                    Correo
-                    <Input name="email" type="email" required />
-                  </label>
-                  <div className="form-actions">
-                    <Button type="submit" className="brand-button" isDisabled={isPending}>
-                      <UserPlus size={18} aria-hidden="true" />
-                      {isPending ? "Guardando..." : "Guardar profesor"}
-                    </Button>
-                  </div>
-                </form>
-              </Modal.Body>
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
-    </>
+      {isOpen ? (
+        <div className="dropdown-panel professor-dropdown-panel">
+          <form className="stacked-form" action={submit}>
+            <div className="form-grid two">
+              <label>
+                Nombre
+                <Input name="firstName" required />
+              </label>
+              <label>
+                Apellidos
+                <Input name="lastName" required />
+              </label>
+            </div>
+            <label>
+              Correo
+              <Input name="email" type="email" required />
+            </label>
+            <div className="form-actions">
+              <Button type="submit" className="brand-button" isDisabled={isPending}>
+                <UserPlus size={18} aria-hidden="true" />
+                {isPending ? "Guardando..." : "Guardar profesor"}
+              </Button>
+            </div>
+          </form>
+        </div>
+      ) : null}
+    </div>
   );
 }

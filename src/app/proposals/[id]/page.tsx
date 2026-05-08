@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { ArrowLeft, ArrowUpRight, CalendarDays, CircleDollarSign, History, MessageSquare, UserRoundCheck } from "lucide-react";
+import { BudgetItemsTable } from "@/components/budget-items-table";
 import { BudgetUpdateDisclosure } from "@/components/budget-update-disclosure";
 import { ClassDisclosure } from "@/components/class-disclosure";
 import { ClassesTable } from "@/components/classes-table";
@@ -108,32 +109,7 @@ export default async function ProposalPage({ params }: ProposalPageProps) {
           <BudgetUpdateDisclosure proposalId={proposal.id} currency={proposal.currency} latestItems={latestBudget?.items ?? []} />
         </Card.Header>
         <Card.Content>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Servicio</th>
-                  <th>Descripcion</th>
-                  <th>Tiempo / unidades</th>
-                  <th>Personas</th>
-                  <th>Precio unitario</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {latestBudget?.items.map((item) => (
-                  <tr key={item.id ?? item.serviceName}>
-                    <td>{item.serviceName}</td>
-                    <td>{item.description || "-"}</td>
-                    <td>{item.quantity}</td>
-                    <td>{item.persons}</td>
-                    <td>{formatCurrency(item.unitPrice, proposal.currency)}</td>
-                    <td>{formatCurrency(item.subtotal, proposal.currency)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <BudgetItemsTable currency={proposal.currency} items={latestBudget?.items ?? []} />
         </Card.Content>
       </Card>
 

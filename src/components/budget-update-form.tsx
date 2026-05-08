@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input } from "@heroui/react";
 import { Plus, Save, Trash2 } from "lucide-react";
+import { AppNumberField, AppSelect } from "@/components/app-controls";
 import { formatCurrency } from "@/lib/format";
 import { proposalResponsibles } from "@/lib/types";
 import type { BudgetItem } from "@/lib/types";
@@ -35,6 +36,7 @@ export function BudgetUpdateForm({ proposalId, currency, latestItems, onSaved }:
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [createdBy, setCreatedBy] = useState<string>(proposalResponsibles[0]);
   const [items, setItems] = useState<BudgetDraft[]>(
     latestItems.length
       ? latestItems.map((item) => ({
@@ -87,20 +89,20 @@ export function BudgetUpdateForm({ proposalId, currency, latestItems, onSaved }:
 
   return (
     <form className="stacked-form" onSubmit={submit}>
-      <div className="form-grid two">
+      <div className="form-grid two compact-fields">
         <label>
           Motivo
           <Input name="reason" placeholder="Ajuste de alcance" />
         </label>
         <label>
           Responsable
-          <select name="createdBy" defaultValue={proposalResponsibles[0]}>
-            {proposalResponsibles.map((responsible) => (
-              <option key={responsible} value={responsible}>
-                {responsible}
-              </option>
-            ))}
-          </select>
+          <AppSelect
+            ariaLabel="Responsable"
+            name="createdBy"
+            onChange={setCreatedBy}
+            options={proposalResponsibles.map((responsible) => ({ key: responsible, label: responsible }))}
+            value={createdBy}
+          />
         </label>
       </div>
 
@@ -135,29 +137,26 @@ export function BudgetUpdateForm({ proposalId, currency, latestItems, onSaved }:
             value={item.description}
             onChange={(event) => updateItem(index, { description: event.target.value })}
           />
-          <Input
-            aria-label="Tiempo o unidades"
-            min="0"
-            step="0.5"
-            type="number"
-            value={String(item.quantity)}
-            onChange={(event) => updateItem(index, { quantity: Number(event.target.value) })}
+          <AppNumberField
+            ariaLabel="Tiempo o unidades"
+            minValue={0}
+            step={0.5}
+            value={item.quantity}
+            onChange={(value) => updateItem(index, { quantity: value })}
           />
-          <Input
-            aria-label="Personas"
-            min="0"
-            step="1"
-            type="number"
-            value={String(item.persons)}
-            onChange={(event) => updateItem(index, { persons: Number(event.target.value) })}
+          <AppNumberField
+            ariaLabel="Personas"
+            minValue={0}
+            step={1}
+            value={item.persons}
+            onChange={(value) => updateItem(index, { persons: value })}
           />
-          <Input
-            aria-label="Precio unitario"
-            min="0"
-            step="0.01"
-            type="number"
-            value={String(item.unitPrice)}
-            onChange={(event) => updateItem(index, { unitPrice: Number(event.target.value) })}
+          <AppNumberField
+            ariaLabel="Precio unitario"
+            minValue={0}
+            step={50}
+            value={item.unitPrice}
+            onChange={(value) => updateItem(index, { unitPrice: value })}
           />
           <Button
             type="button"

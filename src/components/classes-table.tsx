@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@heroui/react";
+import { Button, Table } from "@heroui/react";
 import { Pencil } from "lucide-react";
+import { AppSelect } from "@/components/app-controls";
 import { formatClassStatus, formatDate, formatHours } from "@/lib/format";
 import { classStatuses, type ClassStatus, type Professor, type ProposalClass } from "@/lib/types";
 
@@ -22,12 +23,25 @@ function professorFullName(professor: Professor) {
   return `${professor.firstName} ${professor.lastName}`;
 }
 
+const unassignedProfessorKey = "__unassigned";
+const classStatusTone: Record<ClassStatus, string> = {
+  SEARCHING_PROFESSOR: "class-status-searching",
+  PENDING_CONFIRMATION: "class-status-confirmation",
+  PENDING_PRESENTATION_REVIEW: "class-status-review",
+  PRESENTATION_OK: "class-status-ok"
+};
+
 export function ClassesTable({ proposalId, classes, professors }: ClassesTableProps) {
   const router = useRouter();
   const [rows, setRows] = useState(classes);
   const [editing, setEditing] = useState<EditingCell>(null);
   const [pendingCell, setPendingCell] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  const professorOptions = [
+    { key: unassignedProfessorKey, label: "Pendiente de asignar profesor" },
+    ...professors.map((professor) => ({ key: professor.id, label: professorFullName(professor) }))
+  ];
+  const statusOptions = classStatuses.map((status) => ({ key: status, label: formatClassStatus(status), tone: classStatusTone[status] }));
 
   useEffect(() => {
     setRows(classes);
@@ -78,49 +92,40 @@ export function ClassesTable({ proposalId, classes, professors }: ClassesTablePr
   }
 
   return (
-    <div className="classes-table-wrap">
-      <table className="classes-table">
-        <thead>
-          <tr>
-            <th>Titulo</th>
-            <th>Fecha</th>
-            <th>Hora Inicio</th>
-            <th>Hora Fin</th>
-            <th>Horas totales</th>
-            <th>Profesor</th>
-            <th>Estado Clase</th>
-          </tr>
-        </thead>
-        <tbody>
+    <Table className="app-table-root">
+      <Table.ScrollContainer className="classes-table-wrap">
+        <Table.Content aria-label="Clases y profesores" className="classes-table">
+          <Table.Header>
+            <Table.Column isRowHeader>Titulo</Table.Column>
+            <Table.Column>Fecha</Table.Column>
+            <Table.Column>Hora Inicio</Table.Column>
+            <Table.Column>Hora Fin</Table.Column>
+            <Table.Column>Horas totales</Table.Column>
+            <Table.Column>Profesor</Table.Column>
+            <Table.Column>Estado Clase</Table.Column>
+          </Table.Header>
+          <Table.Body>
           {rows.map((classItem) => {
             const classId = classItem.id ?? "";
             const isProfessorEditing = editing?.classId === classId && editing.field === "professor";
             const isStatusEditing = editing?.classId === classId && editing.field === "status";
 
             return (
-              <tr key={classId || `${classItem.title}-${classItem.classDate}`}>
-                <td data-label="Titulo">{classItem.title}</td>
-                <td data-label="Fecha">{formatDate(classItem.classDate)}</td>
-                <td data-label="Hora Inicio">{classItem.startTime}</td>
-                <td data-label="Hora Fin">{classItem.endTime}</td>
-                <td data-label="Horas totales">{formatHours(classItem.hours)}</td>
-                <td data-label="Profesor">
+              <Table.Row key={classId || `${classItem.title}-${classItem.classDate}`}>
+                <Table.Cell data-label="Titulo">{classItem.title}</Table.Cell>
+                <Table.Cell data-label="Fecha">{formatDate(classItem.classDate)}</Table.Cell>
+                <Table.Cell data-label="Hora Inicio">{classItem.startTime}</Table.Cell>
+                <Table.Cell data-label="Hora Fin">{classItem.endTime}</Table.Cell>
+                <Table.Cell data-label="Horas totales">{formatHours(classItem.hours)}</Table.Cell>
+                <Table.Cell data-label="Profesor">
                   {isProfessorEditing ? (
-                    <select
-                      autoFocus
-                      aria-label="Profesor"
-                      className="inline-select"
-                      disabled={pendingCell === `${classId}-professor`}
-                      value={classItem.professorId ?? ""}
-                      onChange={(event) => updateClass(classItem, { professorId: event.target.value })}
-                    >
-                      <option value="">Pendiente de asignar profesor</option>
-                      {professors.map((professor) => (
-                        <option key={professor.id} value={professor.id}>
-                          {professorFullName(professor)}
-                        </option>
-                      ))}
-                    </select>
+                    <AppSelect
+                      ariaLabel="Profesor"
+                      isDisabled={pendingCell === `${classId}-professor`}
+                      onChange={(value) => updateClass(classItem, { professorId: value === unassignedProfessorKey ? "" : value })}
+                      options={professorOptions}
+                      value={classItem.professorId ?? unassignedProfessorKey}
+                    />
                   ) : (
                     <span className="editable-cell">
                       {classItem.professorName ?? "Pendiente de asignar profesor"}
@@ -137,26 +142,19 @@ export function ClassesTable({ proposalId, classes, professors }: ClassesTablePr
                       ) : null}
                     </span>
                   )}
-                </td>
-                <td data-label="Estado Clase">
+                </Table.Cell>
+                <Table.Cell data-label="Estado Clase">
                   {isStatusEditing ? (
-                    <select
-                      autoFocus
-                      aria-label="Estado Clase"
-                      className="inline-select"
-                      disabled={pendingCell === `${classId}-status`}
+                    <AppSelect
+                      ariaLabel="Estado Clase"
+                      isDisabled={pendingCell === `${classId}-status`}
+                      onChange={(value) => updateClass(classItem, { classStatus: value as ClassStatus })}
+                      options={statusOptions}
                       value={classItem.classStatus}
-                      onChange={(event) => updateClass(classItem, { classStatus: event.target.value as ClassStatus })}
-                    >
-                      {classStatuses.map((status) => (
-                        <option key={status} value={status}>
-                          {formatClassStatus(status)}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   ) : (
                     <span className="editable-cell">
-                      {formatClassStatus(classItem.classStatus)}
+                      <span className={`class-status-badge ${classStatusTone[classItem.classStatus]}`}>{formatClassStatus(classItem.classStatus)}</span>
                       {classId ? (
                         <Button
                           isIconOnly
@@ -170,12 +168,13 @@ export function ClassesTable({ proposalId, classes, professors }: ClassesTablePr
                       ) : null}
                     </span>
                   )}
-                </td>
-              </tr>
+                </Table.Cell>
+              </Table.Row>
             );
           })}
-        </tbody>
-      </table>
-    </div>
+          </Table.Body>
+        </Table.Content>
+      </Table.ScrollContainer>
+    </Table>
   );
 }

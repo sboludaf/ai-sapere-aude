@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input, TextArea } from "@heroui/react";
 import { CalendarDays, Plus, Send, Trash2, WalletCards } from "lucide-react";
+import { AppDatePicker, AppNumberField, AppSelect, AppTimeField } from "@/components/app-controls";
 import { formatCurrency, formatHours } from "@/lib/format";
 import type { Professor } from "@/lib/types";
 
@@ -48,6 +49,8 @@ const emptyClass: ClassDraft = {
   notes: ""
 };
 
+const unassignedProfessorKey = "__unassigned";
+
 function calculateHours(startTime: string, endTime: string) {
   const [startHour, startMinute] = startTime.split(":").map(Number);
   const [endHour, endMinute] = endTime.split(":").map(Number);
@@ -67,6 +70,13 @@ export function ProposalForm({ professors, onSuccess }: ProposalFormProps) {
   const total = useMemo(
     () => budgetItems.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.persons || 0) * Number(item.unitPrice || 0), 0),
     [budgetItems]
+  );
+  const professorOptions = useMemo(
+    () => [
+      { key: unassignedProfessorKey, label: "Pendiente de asignar profesor" },
+      ...professors.map((professor) => ({ key: professor.id, label: `${professor.firstName} ${professor.lastName}` }))
+    ],
+    [professors]
   );
 
   function updateBudgetItem(index: number, patch: Partial<BudgetItemDraft>) {
@@ -185,29 +195,26 @@ export function ProposalForm({ professors, onSuccess }: ProposalFormProps) {
               value={item.description}
               onChange={(event) => updateBudgetItem(index, { description: event.target.value })}
             />
-            <Input
-              aria-label="Tiempo o unidades"
-              min="0"
-              step="0.5"
-              type="number"
-              value={String(item.quantity)}
-              onChange={(event) => updateBudgetItem(index, { quantity: Number(event.target.value) })}
+            <AppNumberField
+              ariaLabel="Tiempo o unidades"
+              minValue={0}
+              step={0.5}
+              value={item.quantity}
+              onChange={(value) => updateBudgetItem(index, { quantity: value })}
             />
-            <Input
-              aria-label="Personas"
-              min="0"
-              step="1"
-              type="number"
-              value={String(item.persons)}
-              onChange={(event) => updateBudgetItem(index, { persons: Number(event.target.value) })}
+            <AppNumberField
+              ariaLabel="Personas"
+              minValue={0}
+              step={1}
+              value={item.persons}
+              onChange={(value) => updateBudgetItem(index, { persons: value })}
             />
-            <Input
-              aria-label="Precio unitario"
-              min="0"
-              step="0.01"
-              type="number"
-              value={String(item.unitPrice)}
-              onChange={(event) => updateBudgetItem(index, { unitPrice: Number(event.target.value) })}
+            <AppNumberField
+              ariaLabel="Precio unitario"
+              minValue={0}
+              step={50}
+              value={item.unitPrice}
+              onChange={(value) => updateBudgetItem(index, { unitPrice: value })}
             />
             <Button
               type="button"
@@ -248,30 +255,15 @@ export function ProposalForm({ professors, onSuccess }: ProposalFormProps) {
               </label>
               <label>
                 Fecha
-                <Input
-                  type="date"
-                  value={classItem.classDate}
-                  onChange={(event) => updateClass(index, { classDate: event.target.value })}
-                  required
-                />
+                <AppDatePicker ariaLabel="Fecha de la clase" onChange={(value) => updateClass(index, { classDate: value })} required value={classItem.classDate} />
               </label>
               <label>
                 Hora inicio
-                <Input
-                  type="time"
-                  value={classItem.startTime}
-                  onChange={(event) => updateClass(index, { startTime: event.target.value })}
-                  required
-                />
+                <AppTimeField ariaLabel="Hora inicio" onChange={(value) => updateClass(index, { startTime: value })} required value={classItem.startTime} />
               </label>
               <label>
                 Hora fin
-                <Input
-                  type="time"
-                  value={classItem.endTime}
-                  onChange={(event) => updateClass(index, { endTime: event.target.value })}
-                  required
-                />
+                <AppTimeField ariaLabel="Hora fin" onChange={(value) => updateClass(index, { endTime: value })} required value={classItem.endTime} />
               </label>
               <label>
                 Horas
@@ -281,24 +273,19 @@ export function ProposalForm({ professors, onSuccess }: ProposalFormProps) {
             <div className="row-grid class-row secondary">
               <label>
                 Profesor
-                <select
-                  aria-label="Profesor"
-                  value={classItem.professorId ?? ""}
-                  onChange={(event) => {
-                    const professor = professors.find((item) => item.id === event.target.value);
+                <AppSelect
+                  ariaLabel="Profesor"
+                  onChange={(value) => {
+                    const professorId = value === unassignedProfessorKey ? "" : value;
+                    const professor = professors.find((item) => item.id === professorId);
                     updateClass(index, {
                       professorId: professor?.id,
                       professorName: professor ? `${professor.firstName} ${professor.lastName}` : undefined
                     });
                   }}
-                >
-                  <option value="">Pendiente de asignar profesor</option>
-                  {professors.map((professor) => (
-                    <option key={professor.id} value={professor.id}>
-                      {professor.firstName} {professor.lastName}
-                    </option>
-                  ))}
-                </select>
+                  options={professorOptions}
+                  value={classItem.professorId ?? unassignedProfessorKey}
+                />
               </label>
               <label>
                 Notas

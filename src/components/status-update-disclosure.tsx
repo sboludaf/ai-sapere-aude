@@ -4,6 +4,7 @@ import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, TextArea } from "@heroui/react";
 import { Save } from "lucide-react";
+import { AppSelect } from "@/components/app-controls";
 import { formatStatus } from "@/lib/format";
 import { proposalResponsibles, proposalStatuses, type ProposalStatus } from "@/lib/types";
 
@@ -17,6 +18,8 @@ export function StatusUpdateDisclosure({ proposalId, currentStatus }: StatusUpda
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [toStatus, setToStatus] = useState<ProposalStatus>(currentStatus);
+  const [changedBy, setChangedBy] = useState<string>(proposalResponsibles[0]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,23 +58,23 @@ export function StatusUpdateDisclosure({ proposalId, currentStatus }: StatusUpda
         <form className="disclosure-panel stacked-form" onSubmit={submit}>
           <label>
             Nuevo estado
-            <select name="toStatus" defaultValue={currentStatus}>
-              {proposalStatuses.map((status) => (
-                <option key={status} value={status}>
-                  {formatStatus(status)}
-                </option>
-              ))}
-            </select>
+            <AppSelect
+              ariaLabel="Nuevo estado"
+              name="toStatus"
+              onChange={(value) => setToStatus(value as ProposalStatus)}
+              options={proposalStatuses.map((status) => ({ key: status, label: formatStatus(status) }))}
+              value={toStatus}
+            />
           </label>
           <label>
             Responsable
-            <select name="changedBy" defaultValue={proposalResponsibles[0]}>
-              {proposalResponsibles.map((responsible) => (
-                <option key={responsible} value={responsible}>
-                  {responsible}
-                </option>
-              ))}
-            </select>
+            <AppSelect
+              ariaLabel="Responsable"
+              name="changedBy"
+              onChange={setChangedBy}
+              options={proposalResponsibles.map((responsible) => ({ key: responsible, label: responsible }))}
+              value={changedBy}
+            />
           </label>
           <label>
             Nota

@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, Mail, Phone, Trash2 } from "lucide-react";
-import { AddProfessorDropdown } from "@/components/add-professor-dropdown";
-import { deleteProfessorAction } from "@/app/actions";
+import { ArrowLeft, Mail, Phone } from "lucide-react";
+import { DeleteProfessorButton } from "@/components/delete-professor-button";
+import { NewProfessorModal } from "@/components/new-professor-modal";
 import { listProfessors } from "@/lib/repositories/proposals";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export default async function ProfessorsPage() {
           <span className="eyebrow">AI Sapere Aude</span>
           <h1>Profesores</h1>
         </div>
-        <AddProfessorDropdown />
+        <NewProfessorModal />
       </header>
 
       <section className="panel">
@@ -48,17 +48,7 @@ export default async function ProfessorsPage() {
                   </p>
                 ) : null}
               </div>
-              <form action={deleteProfessorAction}>
-                <input type="hidden" name="professorId" value={professor.id} />
-                <button
-                  type="submit"
-                  className="delete-professor-button"
-                  aria-label={`Eliminar ${professor.firstName} ${professor.lastName}`}
-                  title="Eliminar profesor"
-                >
-                  <Trash2 size={15} aria-hidden="true" />
-                </button>
-              </form>
+              <DeleteProfessorButton label={`Eliminar ${professor.firstName} ${professor.lastName}`} professorId={professor.id} />
             </article>
           ))}
         </div>
