@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { ArrowLeft, ArrowUpRight, CalendarDays, CircleDollarSign, History, MessageSquare, UserRoundCheck } from "lucide-react";
+import { ArrowUpRight, CalendarDays, CircleDollarSign, History, MessageSquare, UserRoundCheck } from "lucide-react";
 import { BudgetItemsTable } from "@/components/budget-items-table";
 import { BudgetUpdateDisclosure } from "@/components/budget-update-disclosure";
 import { ClassDisclosure } from "@/components/class-disclosure";
@@ -64,12 +63,8 @@ export default async function ProposalPage({ params }: ProposalPageProps) {
     <div className="page">
       <header className="page-header proposal-detail-header">
         <div className="page-title">
-          <Link className="secondary-button" href="/">
-            <ArrowLeft size={18} aria-hidden="true" />
-            Volver
-          </Link>
-          <span className="eyebrow">{proposal.companyName}</span>
           <h1>{proposal.title}</h1>
+          <span className="eyebrow">{proposal.companyName}</span>
         </div>
         <div className="detail-header-actions">
           <div className="detail-status-row">

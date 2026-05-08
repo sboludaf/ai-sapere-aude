@@ -260,9 +260,10 @@ h3 {
 }
 
 .proposal-detail-header .detail-status-row {
+  left: 50%;
   position: absolute;
-  right: 0;
   top: 0;
+  transform: translateX(-50%);
   width: auto;
   z-index: 5;
 }
@@ -1698,7 +1699,7 @@ td {
   }
 
   .proposal-detail-header .detail-status-row {
-    right: 0;
+    left: 50%;
     top: 0;
   }
 
@@ -1708,7 +1709,7 @@ td {
   }
 
   .detail-status-row {
-    justify-content: flex-end;
+    justify-content: center;
   }
 
   .detail-action-row {
