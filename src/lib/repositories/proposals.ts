@@ -129,6 +129,42 @@ function calculateHours(startTime: string, endTime: string) {
   return Number((diff / 60).toFixed(2));
 }
 
+function isUnassignedProfessorName(value?: string | null) {
+  const normalized = value?.trim().toLowerCase();
+
+  return (
+    !normalized ||
+    normalized === "sin definir" ||
+    normalized === "sin asignar" ||
+    normalized === "pendiente de asignar profesor" ||
+    normalized === "pendiente asignar profesor"
+  );
+}
+
+function pendingClassCountSql() {
+  return `
+    COUNT(
+      DISTINCT
+      CASE
+        WHEN ppa.id IS NOT NULL
+          AND ppa.professor_id IS NULL
+          AND (
+            ppa.professor_name IS NULL
+            OR TRIM(ppa.professor_name) = ''
+            OR LOWER(TRIM(ppa.professor_name)) IN (
+              'sin definir',
+              'sin asignar',
+              'pendiente de asignar profesor',
+              'pendiente asignar profesor'
+            )
+          )
+        THEN ppa.id
+        ELSE NULL
+      END
+    )
+  `;
+}
+
 function mapProposalSummary(row: ProposalSummaryRow): ProposalSummary {
   return {
     id: row.id,
@@ -143,7 +179,7 @@ function mapProposalSummary(row: ProposalSummaryRow): ProposalSummary {
     endDate: row.endDate,
     commentCount: Number(row.commentCount),
     classCount: Number(row.classCount),
-    pendingClassCount: Number(row.pendingClassCount),
+    pendingClassCount: Number(row.pendingClassCount ?? 0),
     updatedAt: toIsoString(row.updatedAt)
   };
 }
@@ -366,7 +402,7 @@ export async function listProposals(): Promise<ProposalSummary[]> {
       p.updated_at AS updatedAt,
       COUNT(DISTINCT pc.id) AS commentCount,
       COUNT(DISTINCT ppa.id) AS classCount,
-      SUM(CASE WHEN ppa.professor_id IS NULL AND ppa.professor_name IS NULL THEN 1 ELSE 0 END) AS pendingClassCount
+      ${pendingClassCountSql()} AS pendingClassCount
     FROM proposals p
     INNER JOIN companies c ON c.id = p.company_id
     LEFT JOIN proposal_comments pc ON pc.proposal_id = p.id
@@ -398,7 +434,7 @@ export async function getProposal(id: string): Promise<ProposalDetail | null> {
         p.updated_at AS updatedAt,
         COUNT(DISTINCT pc.id) AS commentCount,
         COUNT(DISTINCT ppa.id) AS classCount,
-        SUM(CASE WHEN ppa.professor_id IS NULL AND ppa.professor_name IS NULL THEN 1 ELSE 0 END) AS pendingClassCount
+        ${pendingClassCountSql()} AS pendingClassCount
       FROM proposals p
       INNER JOIN companies c ON c.id = p.company_id
       LEFT JOIN proposal_comments pc ON pc.proposal_id = p.id
@@ -536,7 +572,7 @@ export async function getProposal(id: string): Promise<ProposalDetail | null> {
         id: classItem.id,
         title: classItem.title,
         professorId: classItem.professorId,
-        professorName: classItem.professorName,
+        professorName: isUnassignedProfessorName(classItem.professorName) ? null : classItem.professorName,
         classDate: classItem.classDate,
         startTime: normalizeTime(classItem.startTime),
         endTime: normalizeTime(classItem.endTime),
@@ -828,7 +864,7 @@ export async function listCalendarEvents(): Promise<CalendarEvent[]> {
     startTime: String(row.startTime ?? "").slice(0, 5),
     endTime: String(row.endTime ?? "").slice(0, 5),
     classStatus: row.classStatus,
-    professorName: row.professorName,
+    professorName: isUnassignedProfessorName(row.professorName) ? null : row.professorName,
     proposalId: row.proposalId,
     proposalTitle: row.proposalTitle
   }));

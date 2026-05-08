@@ -23,7 +23,7 @@ const Card = Object.assign(CardRoot, {
     return <div className={className}>{children}</div>;
   },
   Content({ children }: { children: ReactNode }) {
-    return <div>{children}</div>;
+    return <div className="panel-content">{children}</div>;
   }
 });
 
@@ -62,7 +62,7 @@ export default async function ProposalPage({ params }: ProposalPageProps) {
 
   return (
     <div className="page">
-      <header className="page-header">
+      <header className="page-header proposal-detail-header">
         <div className="page-title">
           <Link className="secondary-button" href="/">
             <ArrowLeft size={18} aria-hidden="true" />
@@ -71,13 +71,17 @@ export default async function ProposalPage({ params }: ProposalPageProps) {
           <span className="eyebrow">{proposal.companyName}</span>
           <h1>{proposal.title}</h1>
         </div>
-        <div className="top-actions">
-          <StatusBadge status={proposal.status} />
-          <a className="presentation-button link-button" href={proposal.presentationUrl} target="_blank" rel="noreferrer">
-            Presentacion
-            <ArrowUpRight size={18} aria-hidden="true" />
-          </a>
-          <StatusUpdateDisclosure proposalId={proposal.id} currentStatus={proposal.status} />
+        <div className="detail-header-actions">
+          <div className="detail-status-row">
+            <StatusBadge status={proposal.status} />
+          </div>
+          <div className="detail-action-row">
+            <a className="presentation-button link-button" href={proposal.presentationUrl} target="_blank" rel="noreferrer">
+              Presentacion
+              <ArrowUpRight size={18} aria-hidden="true" />
+            </a>
+            <StatusUpdateDisclosure proposalId={proposal.id} currentStatus={proposal.status} />
+          </div>
         </div>
       </header>
 

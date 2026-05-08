@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@heroui/react";
-import { ArrowUpRight, Filter } from "lucide-react";
+import { Filter } from "lucide-react";
 import { StatusBadge } from "@/components/status-badge";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { ProposalStatus, ProposalSummary } from "@/lib/types";
@@ -22,28 +22,23 @@ const statusFilters: Array<{ status: ProposalStatus; label: string }> = [
 
 function ProposalCard({ proposal }: { proposal: ProposalSummary }) {
   return (
-    <article className="proposal-card">
-      <div className="proposal-card-header">
+    <Link className="proposal-card proposal-card-link" href={`/proposals/${proposal.id}`} aria-label={`Abrir ${proposal.title}`}>
+      <div className="proposal-card-main">
         <div className="proposal-card-title">
           <h3>{proposal.title}</h3>
           <p className="subtle">{proposal.companyName}</p>
         </div>
-        <StatusBadge status={proposal.status} />
+        <div className="proposal-card-side">
+          <StatusBadge status={proposal.status} />
+          <span className="summary-chip proposal-budget">{formatCurrency(proposal.totalCost, proposal.currency)}</span>
+        </div>
       </div>
-      <div className="proposal-meta">
-        <span className="summary-chip">{formatCurrency(proposal.totalCost, proposal.currency)}</span>
+      <div className="proposal-card-details">
         <span>{formatDate(proposal.startDate)}</span>
         <span>{proposal.classCount} clases</span>
         <span>{proposal.pendingClassCount} pendientes profesor</span>
-        <span>{proposal.commentCount} comentarios</span>
       </div>
-      <div className="proposal-card-footer">
-        <Link className="secondary-button" href={`/proposals/${proposal.id}`}>
-          Abrir
-          <ArrowUpRight size={16} aria-hidden="true" />
-        </Link>
-      </div>
-    </article>
+    </Link>
   );
 }
 

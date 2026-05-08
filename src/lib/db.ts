@@ -1,7 +1,9 @@
 import mysql from "mysql2/promise";
 
-let pool: mysql.Pool | undefined;
-let dbVerified = false;
+const globalForMysql = globalThis as typeof globalThis & {
+  aiSapereMysqlPool?: mysql.Pool;
+  aiSapereMysqlVerified?: boolean;
+};
 
 const dbConfig = {
   host: process.env.MYSQL_HOST ?? "127.0.0.1",
@@ -12,7 +14,7 @@ const dbConfig = {
 };
 
 export function getPool() {
-  if (!pool) {
+  if (!globalForMysql.aiSapereMysqlPool) {
     console.log("[DB] Creating connection pool →", {
       host: dbConfig.host,
       port: dbConfig.port,
@@ -21,10 +23,10 @@ export function getPool() {
       password: dbConfig.password ? "***set***" : "(not set)"
     });
 
-    pool = mysql.createPool({
+    globalForMysql.aiSapereMysqlPool = mysql.createPool({
       ...dbConfig,
       waitForConnections: true,
-      connectionLimit: 10,
+      connectionLimit: 5,
       queueLimit: 0,
       connectTimeout: 5000,
       idleTimeout: 60000,
@@ -37,11 +39,11 @@ export function getPool() {
     });
   }
 
-  return pool;
+  return globalForMysql.aiSapereMysqlPool;
 }
 
 export async function verifyConnection() {
-  if (dbVerified) return;
+  if (globalForMysql.aiSapereMysqlVerified) return;
 
   const start = Date.now();
   console.log("[DB] Verifying database connection...");
@@ -52,7 +54,7 @@ export async function verifyConnection() {
       const [rows] = await connection.query("SELECT 1 AS ok");
       const elapsed = Date.now() - start;
       console.log("[DB] ✓ Connection verified in", elapsed, "ms →", JSON.stringify(rows));
-      dbVerified = true;
+      globalForMysql.aiSapereMysqlVerified = true;
     } finally {
       connection.release();
     }
@@ -73,11 +75,11 @@ export async function verifyConnection() {
 }
 
 export async function resetPool() {
-  if (pool) {
+  if (globalForMysql.aiSapereMysqlPool) {
     console.log("[DB] Resetting connection pool");
-    await pool.end();
-    pool = undefined;
-    dbVerified = false;
+    await globalForMysql.aiSapereMysqlPool.end();
+    globalForMysql.aiSapereMysqlPool = undefined;
+    globalForMysql.aiSapereMysqlVerified = false;
   }
 }
 

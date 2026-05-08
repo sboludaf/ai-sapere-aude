@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { today, getLocalTimeZone } from "@internationalized/date";
+import { formatClassStatus, formatDate } from "@/lib/format";
 import type { CalendarEvent, ClassStatus } from "@/lib/types";
 
 type ClassesCalendarProps = {
@@ -39,9 +40,11 @@ function dateKey(year: number, month: number, day: number) {
 }
 
 export function ClassesCalendar({ events }: ClassesCalendarProps) {
+  const router = useRouter();
   const todayDate = today(getLocalTimeZone());
   const [focusedYear, setFocusedYear] = useState(todayDate.year);
   const [focusedMonth, setFocusedMonth] = useState(todayDate.month);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   const eventsByDate = useMemo(() => {
     const map = new Map<string, CalendarEvent[]>();
@@ -68,6 +71,16 @@ export function ClassesCalendar({ events }: ClassesCalendarProps) {
     }
     setFocusedMonth(newMonth);
     setFocusedYear(newYear);
+    setSelectedEventId(null);
+  }
+
+  function selectEvent(event: CalendarEvent) {
+    if (selectedEventId === event.classId) {
+      router.push(`/proposals/${event.proposalId}`);
+      return;
+    }
+
+    setSelectedEventId(event.classId);
   }
 
   const daysInMonth = getDaysInMonth(focusedYear, focusedMonth);
@@ -84,6 +97,7 @@ export function ClassesCalendar({ events }: ClassesCalendarProps) {
   }
 
   const todayKey = dateKey(todayDate.year, todayDate.month, todayDate.day);
+  const selectedEvent = selectedEventId ? events.find((event) => event.classId === selectedEventId) : null;
 
   return (
     <section className="cal-section" aria-label="Calendario de clases">
@@ -138,19 +152,25 @@ export function ClassesCalendar({ events }: ClassesCalendarProps) {
                 <>
                   <span className="cal-day-number">{cell.day}</span>
                   <div className="cal-events">
-                    {cell.events.map((event) => (
-                      <Link
+                    {cell.events.map((event) => {
+                      const isSelected = selectedEventId === event.classId;
+
+                      return (
+                      <button
                         key={event.classId}
-                        href={`/proposals/${event.proposalId}`}
-                        className={`cal-event ${statusTone[event.classStatus] ?? ""}`}
+                        type="button"
+                        className={`cal-event ${statusTone[event.classStatus] ?? ""} ${isSelected ? "cal-event-selected" : ""}`}
+                        onClick={() => selectEvent(event)}
+                        aria-pressed={isSelected}
                         title={`${event.classTitle} — ${event.proposalTitle}`}
                       >
                         <span className="cal-event-title">{event.classTitle}</span>
                         <span className={event.professorName ? "cal-event-professor" : "cal-event-professor cal-event-unassigned"}>
                           {event.professorName ?? "Sin Definir"}
                         </span>
-                      </Link>
-                    ))}
+                      </button>
+                      );
+                    })}
                   </div>
                 </>
               ) : null}
@@ -158,6 +178,25 @@ export function ClassesCalendar({ events }: ClassesCalendarProps) {
           );
         })}
       </div>
+
+      {selectedEvent ? (
+        <aside className={`cal-detail ${statusTone[selectedEvent.classStatus] ?? ""}`}>
+          <div>
+            <strong>{selectedEvent.classTitle}</strong>
+            <span>{selectedEvent.proposalTitle}</span>
+          </div>
+          <div>
+            <span>{formatDate(selectedEvent.classDate)}</span>
+            <span>
+              {selectedEvent.startTime} - {selectedEvent.endTime}
+            </span>
+          </div>
+          <div>
+            <span>{selectedEvent.professorName ?? "Sin Definir"}</span>
+            <span>{formatClassStatus(selectedEvent.classStatus)}</span>
+          </div>
+        </aside>
+      ) : null}
     </section>
   );
 }

@@ -16,10 +16,11 @@ export function BudgetUpdateDisclosure({ proposalId, currency, latestItems }: Bu
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="disclosure">
-      <Button className="brand-button" onPress={() => setIsOpen((current) => !current)}>
+    <div className="disclosure budget-update-disclosure">
+      <Button className="brand-button budget-update-button" onPress={() => setIsOpen((current) => !current)}>
         <CircleDollarSign size={18} aria-hidden="true" />
-        Modificar presupuesto
+        <span className="budget-update-label-desktop">Modificar presupuesto</span>
+        <span className="budget-update-label-mobile">Modificar</span>
       </Button>
       {isOpen ? (
         <div className="disclosure-panel">

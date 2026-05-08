@@ -6,17 +6,23 @@ import { ProposalForm } from "@/components/proposal-form";
 import type { Professor } from "@/lib/types";
 
 type NewProposalModalProps = {
+  compact?: boolean;
   professors: Professor[];
 };
 
-export function NewProposalModal({ professors }: NewProposalModalProps) {
+export function NewProposalModal({ compact = false, professors }: NewProposalModalProps) {
   const state = useOverlayState();
 
   return (
     <>
-      <Button className="brand-button" onPress={state.open}>
+      <Button
+        aria-label="Nueva propuesta"
+        className={compact ? "brand-button new-proposal-icon-button" : "brand-button"}
+        isIconOnly={compact}
+        onPress={state.open}
+      >
         <Plus size={18} aria-hidden="true" />
-        Nueva propuesta
+        {compact ? null : "Nueva propuesta"}
       </Button>
       <Modal state={state}>
         <Modal.Backdrop>

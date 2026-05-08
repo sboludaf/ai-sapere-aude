@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { UsersRound } from "lucide-react";
 import { ClassesCalendar } from "@/components/classes-calendar";
 import { NewProposalModal } from "@/components/new-proposal-modal";
 import { ProposalsDashboard } from "@/components/proposals-dashboard";
@@ -16,17 +14,13 @@ export default async function HomePage() {
 
   return (
     <div className="page">
-      <header className="page-header">
-        <div className="page-title">
+      <header className="page-header proposals-header">
+        <div className="page-title proposals-title">
           <span className="eyebrow">AI Sapere Aude</span>
-          <h1>Propuestas</h1>
-        </div>
-        <div className="top-actions">
-          <Link className="secondary-button" href="/professors">
-            <UsersRound size={18} aria-hidden="true" />
-            Profesores
-          </Link>
-          <NewProposalModal professors={professors} />
+          <div className="title-action-row">
+            <h1>Propuestas</h1>
+            <NewProposalModal compact professors={professors} />
+          </div>
         </div>
       </header>
 

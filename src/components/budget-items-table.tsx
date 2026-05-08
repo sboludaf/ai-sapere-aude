@@ -12,8 +12,8 @@ type BudgetItemsTableProps = {
 export function BudgetItemsTable({ currency, items }: BudgetItemsTableProps) {
   return (
     <Table className="app-table-root">
-      <Table.ScrollContainer className="table-wrap">
-        <Table.Content aria-label="Servicios y presupuesto" className="app-data-table">
+      <Table.ScrollContainer className="classes-table-wrap budget-table-wrap">
+        <Table.Content aria-label="Servicios y presupuesto" className="budget-table">
           <Table.Header>
             <Table.Column isRowHeader>Servicio</Table.Column>
             <Table.Column>Descripcion</Table.Column>
@@ -25,12 +25,12 @@ export function BudgetItemsTable({ currency, items }: BudgetItemsTableProps) {
           <Table.Body>
             {items.map((item) => (
               <Table.Row key={item.id ?? item.serviceName}>
-                <Table.Cell>{item.serviceName}</Table.Cell>
-                <Table.Cell>{item.description || "-"}</Table.Cell>
-                <Table.Cell>{item.quantity}</Table.Cell>
-                <Table.Cell>{item.persons}</Table.Cell>
-                <Table.Cell>{formatCurrency(item.unitPrice, currency)}</Table.Cell>
-                <Table.Cell>{formatCurrency(item.subtotal, currency)}</Table.Cell>
+                <Table.Cell data-label="Servicio">{item.serviceName}</Table.Cell>
+                <Table.Cell data-label="Descripcion">{item.description || "-"}</Table.Cell>
+                <Table.Cell data-label="Tiempo / unidades">{item.quantity}</Table.Cell>
+                <Table.Cell data-label="Personas">{item.persons}</Table.Cell>
+                <Table.Cell data-label="Precio unitario">{formatCurrency(item.unitPrice, currency)}</Table.Cell>
+                <Table.Cell data-label="Total">{formatCurrency(item.subtotal, currency)}</Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
