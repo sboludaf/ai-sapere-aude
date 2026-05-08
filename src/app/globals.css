@@ -1501,3 +1501,183 @@ td {
     width: 100%;
   }
 }
+
+/* ── Classes Calendar ── */
+
+.cal-section {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.cal-header {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.cal-month-label {
+  font-size: 1.1rem;
+  font-weight: 800;
+  min-width: 200px;
+  text-align: center;
+}
+
+.cal-nav-button {
+  align-items: center;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s;
+  width: 34px;
+}
+
+.cal-nav-button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.cal-grid {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.cal-weekday {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 6px 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.cal-cell {
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  min-height: 90px;
+  padding: 6px 8px;
+  position: relative;
+}
+
+.cal-cell-empty {
+  background: transparent;
+  border-color: transparent;
+}
+
+.cal-cell-today {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.cal-cell-has-events {
+  background: rgba(150, 233, 206, 0.06);
+}
+
+.cal-day-number {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.cal-cell-today .cal-day-number {
+  color: var(--primary);
+}
+
+.cal-events {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.cal-event {
+  border-left: 3px solid var(--cal-accent, var(--primary));
+  border-radius: 4px;
+  background: var(--cal-bg, rgba(150, 233, 206, 0.12));
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+  padding: 3px 6px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.cal-event:hover {
+  filter: brightness(1.3);
+}
+
+.cal-event-searching {
+  --cal-accent: #ff8b80;
+  --cal-bg: rgba(255, 139, 128, 0.15);
+}
+
+.cal-event-confirmation {
+  --cal-accent: #f7c76a;
+  --cal-bg: rgba(247, 199, 106, 0.16);
+}
+
+.cal-event-review {
+  --cal-accent: #dbc8ff;
+  --cal-bg: rgba(219, 200, 255, 0.17);
+}
+
+.cal-event-ok {
+  --cal-accent: var(--primary);
+  --cal-bg: rgba(150, 233, 206, 0.18);
+}
+
+.cal-event-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cal-event-professor {
+  color: var(--cal-accent, var(--primary));
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cal-event-unassigned {
+  color: var(--muted);
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .cal-cell {
+    min-height: 60px;
+    padding: 4px;
+  }
+
+  .cal-event-title {
+    font-size: 0.6rem;
+  }
+
+  .cal-event-professor {
+    display: none;
+  }
+}

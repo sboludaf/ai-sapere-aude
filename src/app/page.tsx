@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { UsersRound } from "lucide-react";
+import { ClassesCalendar } from "@/components/classes-calendar";
 import { NewProposalModal } from "@/components/new-proposal-modal";
 import { ProposalsDashboard } from "@/components/proposals-dashboard";
-import { listProfessors, listProposals } from "@/lib/repositories/proposals";
+import { listCalendarEvents, listProfessors, listProposals } from "@/lib/repositories/proposals";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [proposals, professors] = await Promise.all([listProposals(), listProfessors()]);
+  const [proposals, professors, calendarEvents] = await Promise.all([
+    listProposals(),
+    listProfessors(),
+    listCalendarEvents()
+  ]);
 
   return (
     <div className="page">
@@ -25,6 +30,7 @@ export default async function HomePage() {
         </div>
       </header>
 
+      <ClassesCalendar events={calendarEvents} />
       <ProposalsDashboard proposals={proposals} />
     </div>
   );

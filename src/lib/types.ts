@@ -138,6 +138,18 @@ export type CreateProposalClassInput = {
   notes?: string;
 };
 
+export type CalendarEvent = {
+  classId: string;
+  classTitle: string;
+  classDate: string;
+  startTime: string;
+  endTime: string;
+  classStatus: ClassStatus;
+  professorName: string | null;
+  proposalId: string;
+  proposalTitle: string;
+};
+
 export type SyncProposalSnapshot = {
   id: string;
   title: string;

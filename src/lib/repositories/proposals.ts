@@ -16,6 +16,7 @@ import type {
   BudgetCategory,
   BudgetItem,
   BudgetVersion,
+  CalendarEvent,
   ClassStatus,
   CreateProposalInput,
   CreateProposalClassInput,
@@ -798,6 +799,39 @@ export async function createProposalClass(input: CreateProposalClassInput) {
 
   await syncProposalById(parsed.proposalId);
   return id;
+}
+
+export async function listCalendarEvents(): Promise<CalendarEvent[]> {
+  await ensureApplicationSchema();
+  const [rows] = await getPool().query<Array<RowDataPacket & CalendarEvent>>(
+    `
+    SELECT
+      ppa.id AS classId,
+      ppa.class_title AS classTitle,
+      ppa.session_date AS classDate,
+      ppa.start_time AS startTime,
+      ppa.end_time AS endTime,
+      ppa.class_status AS classStatus,
+      ppa.professor_name AS professorName,
+      p.id AS proposalId,
+      p.title AS proposalTitle
+    FROM proposal_professor_assignments ppa
+    INNER JOIN proposals p ON p.id = ppa.proposal_id
+    ORDER BY ppa.session_date ASC, ppa.start_time ASC
+    `
+  );
+
+  return rows.map((row) => ({
+    classId: row.classId,
+    classTitle: row.classTitle,
+    classDate: toIsoString(row.classDate).slice(0, 10),
+    startTime: String(row.startTime ?? "").slice(0, 5),
+    endTime: String(row.endTime ?? "").slice(0, 5),
+    classStatus: row.classStatus,
+    professorName: row.professorName,
+    proposalId: row.proposalId,
+    proposalTitle: row.proposalTitle
+  }));
 }
 
 export async function listProfessors(): Promise<Professor[]> {
