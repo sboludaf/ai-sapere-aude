@@ -6,6 +6,7 @@ import {
   addProposalComment,
   createProfessor,
   deleteProfessor,
+  updateProfessor,
   updateProposalClass,
   updateProposalBudget,
   updateProposalStatus
@@ -94,11 +95,25 @@ export async function createProfessorAction(formData: FormData) {
     firstName: value(formData, "firstName"),
     lastName: value(formData, "lastName"),
     email: value(formData, "email"),
-    phone: value(formData, "phone") || undefined
+    phone: value(formData, "phone") || undefined,
+    linkedin: value(formData, "linkedin") || undefined
   });
 
   revalidatePath("/professors");
   redirect("/professors");
+}
+
+export async function updateProfessorAction(formData: FormData) {
+  await updateProfessor({
+    id: value(formData, "professorId"),
+    firstName: value(formData, "firstName"),
+    lastName: value(formData, "lastName"),
+    email: value(formData, "email"),
+    phone: value(formData, "phone") || undefined,
+    linkedin: value(formData, "linkedin") || undefined
+  });
+
+  revalidatePath("/professors");
 }
 
 export async function deleteProfessorAction(formData: FormData) {

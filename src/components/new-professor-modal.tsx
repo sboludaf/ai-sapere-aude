@@ -40,6 +40,16 @@ export function NewProfessorModal() {
               Correo
               <Input name="email" type="email" required />
             </label>
+            <div className="form-grid two">
+              <label>
+                Telefono
+                <Input name="phone" type="tel" placeholder="+34 600 000 000" />
+              </label>
+              <label>
+                LinkedIn
+                <Input name="linkedin" type="url" placeholder="https://linkedin.com/in/..." />
+              </label>
+            </div>
             <div className="form-actions">
               <Button type="submit" className="brand-button" isDisabled={isPending}>
                 <UserPlus size={18} aria-hidden="true" />

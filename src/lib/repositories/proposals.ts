@@ -1,5 +1,5 @@
 import type { PoolConnection, RowDataPacket } from "mysql2/promise";
-import { getPool, toIsoString, withTransaction } from "@/lib/db";
+import { getPool, toIsoString, verifyConnection, withTransaction } from "@/lib/db";
 import { syncProposalGraph } from "@/lib/integrations/neo4j";
 import { syncProposalVector } from "@/lib/integrations/qdrant";
 import {
@@ -8,6 +8,7 @@ import {
   createProfessorSchema,
   createProposalSchema,
   updateBudgetSchema,
+  updateProfessorSchema,
   updateProposalClassSchema,
   updateStatusSchema
 } from "@/lib/validation";
@@ -169,6 +170,7 @@ async function ignoreSchemaError(statement: string) {
 async function ensureApplicationSchema() {
   if (!schemaReady) {
     schemaReady = (async () => {
+      await verifyConnection();
       await ignoreSchemaError(
         `
         ALTER TABLE proposals
@@ -240,6 +242,7 @@ async function ensureApplicationSchema() {
       await ignoreSchemaError("ALTER TABLE proposal_professor_assignments MODIFY professor_name VARCHAR(255) NULL");
       await ignoreSchemaError("ALTER TABLE budget_items ADD COLUMN persons DECIMAL(10,2) NOT NULL DEFAULT 1 AFTER quantity");
       await ignoreSchemaError("ALTER TABLE professors ADD COLUMN phone VARCHAR(30) NULL AFTER email");
+      await ignoreSchemaError("ALTER TABLE professors ADD COLUMN linkedin VARCHAR(512) NULL AFTER phone");
       await ignoreSchemaError("ALTER TABLE proposal_professor_assignments ADD COLUMN class_title VARCHAR(255) NOT NULL DEFAULT 'Clase' AFTER professor_id");
       await ignoreSchemaError("ALTER TABLE proposal_professor_assignments ADD COLUMN start_time TIME NULL AFTER session_date");
       await ignoreSchemaError("ALTER TABLE proposal_professor_assignments ADD COLUMN end_time TIME NULL AFTER start_time");
@@ -345,45 +348,34 @@ async function syncProposalById(id: string) {
 }
 
 export async function listProposals(): Promise<ProposalSummary[]> {
-  try {
-    await ensureApplicationSchema();
-    const [rows] = await getPool().query<ProposalSummaryRow[]>(
-      `
-      SELECT
-        p.id,
-        p.title,
-        c.name AS companyName,
-        p.consultation_type AS consultationType,
-        p.presentation_url AS presentationUrl,
-        p.current_status AS status,
-        p.total_cost AS totalCost,
-        p.currency,
-        p.start_date AS startDate,
-        p.end_date AS endDate,
-        p.updated_at AS updatedAt,
-        COUNT(DISTINCT pc.id) AS commentCount,
-        COUNT(DISTINCT ppa.id) AS classCount,
-        SUM(CASE WHEN ppa.professor_id IS NULL AND ppa.professor_name IS NULL THEN 1 ELSE 0 END) AS pendingClassCount
-      FROM proposals p
-      INNER JOIN companies c ON c.id = p.company_id
-      LEFT JOIN proposal_comments pc ON pc.proposal_id = p.id
-      LEFT JOIN proposal_professor_assignments ppa ON ppa.proposal_id = p.id
-      GROUP BY p.id, c.name
-      ORDER BY p.updated_at DESC
-      `
-    );
+  await ensureApplicationSchema();
+  const [rows] = await getPool().query<ProposalSummaryRow[]>(
+    `
+    SELECT
+      p.id,
+      p.title,
+      c.name AS companyName,
+      p.consultation_type AS consultationType,
+      p.presentation_url AS presentationUrl,
+      p.current_status AS status,
+      p.total_cost AS totalCost,
+      p.currency,
+      p.start_date AS startDate,
+      p.end_date AS endDate,
+      p.updated_at AS updatedAt,
+      COUNT(DISTINCT pc.id) AS commentCount,
+      COUNT(DISTINCT ppa.id) AS classCount,
+      SUM(CASE WHEN ppa.professor_id IS NULL AND ppa.professor_name IS NULL THEN 1 ELSE 0 END) AS pendingClassCount
+    FROM proposals p
+    INNER JOIN companies c ON c.id = p.company_id
+    LEFT JOIN proposal_comments pc ON pc.proposal_id = p.id
+    LEFT JOIN proposal_professor_assignments ppa ON ppa.proposal_id = p.id
+    GROUP BY p.id, c.name
+    ORDER BY p.updated_at DESC
+    `
+  );
 
-    return rows.map(mapProposalSummary);
-  } catch (error) {
-    console.error("[listProposals] DB connection failed:", {
-      host: process.env.MYSQL_HOST,
-      port: process.env.MYSQL_PORT,
-      user: process.env.MYSQL_USER,
-      database: process.env.MYSQL_DATABASE,
-      error: error instanceof Error ? error.message : String(error)
-    });
-    return [];
-  }
+  return rows.map(mapProposalSummary);
 }
 
 export async function getProposal(id: string): Promise<ProposalDetail | null> {
@@ -808,39 +800,33 @@ export async function createProposalClass(input: CreateProposalClassInput) {
 }
 
 export async function listProfessors(): Promise<Professor[]> {
-  try {
-    await ensureApplicationSchema();
-    const [rows] = await getPool().query<ProfessorRow[]>(
-      `
-      SELECT
-        id,
-        first_name AS firstName,
-        last_name AS lastName,
-        email,
-        phone,
-        active,
-        created_at AS createdAt
-      FROM professors
-      ORDER BY active DESC, last_name ASC, first_name ASC
-      `
-    );
+  await ensureApplicationSchema();
+  const [rows] = await getPool().query<ProfessorRow[]>(
+    `
+    SELECT
+      id,
+      first_name AS firstName,
+      last_name AS lastName,
+      email,
+      phone,
+      linkedin,
+      active,
+      created_at AS createdAt
+    FROM professors
+    ORDER BY active DESC, last_name ASC, first_name ASC
+    `
+  );
 
-    return rows.map((professor) => ({
-      id: professor.id,
-      firstName: professor.firstName,
-      lastName: professor.lastName,
-      email: professor.email,
-      phone: professor.phone ?? null,
-      active: Boolean(professor.active),
-      createdAt: toIsoString(professor.createdAt)
-    }));
-  } catch (error) {
-    console.error("[listProfessors] DB connection failed:", {
-      host: process.env.MYSQL_HOST,
-      error: error instanceof Error ? error.message : String(error)
-    });
-    return [];
-  }
+  return rows.map((professor) => ({
+    id: professor.id,
+    firstName: professor.firstName,
+    lastName: professor.lastName,
+    email: professor.email,
+    phone: professor.phone ?? null,
+    linkedin: professor.linkedin ?? null,
+    active: Boolean(professor.active),
+    createdAt: toIsoString(professor.createdAt)
+  }));
 }
 
 export async function createProfessor(input: {
@@ -848,22 +834,45 @@ export async function createProfessor(input: {
   lastName: string;
   email: string;
   phone?: string;
+  linkedin?: string;
 }) {
   await ensureApplicationSchema();
   const parsed = createProfessorSchema.parse(input);
 
   await getPool().execute(
     `
-    INSERT INTO professors (id, first_name, last_name, email, phone)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO professors (id, first_name, last_name, email, phone, linkedin)
+    VALUES (?, ?, ?, ?, ?, ?)
     ON DUPLICATE KEY UPDATE
       first_name = VALUES(first_name),
       last_name = VALUES(last_name),
       phone = VALUES(phone),
+      linkedin = VALUES(linkedin),
       active = TRUE,
       updated_at = CURRENT_TIMESTAMP
     `,
-    [crypto.randomUUID(), parsed.firstName, parsed.lastName, parsed.email, parsed.phone ?? null]
+    [crypto.randomUUID(), parsed.firstName, parsed.lastName, parsed.email, parsed.phone ?? null, parsed.linkedin ?? null]
+  );
+}
+
+export async function updateProfessor(input: {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  linkedin?: string;
+}) {
+  await ensureApplicationSchema();
+  const parsed = updateProfessorSchema.parse(input);
+
+  await getPool().execute(
+    `
+    UPDATE professors
+    SET first_name = ?, last_name = ?, email = ?, phone = ?, linkedin = ?, updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+    `,
+    [parsed.firstName, parsed.lastName, parsed.email, parsed.phone ?? null, parsed.linkedin ?? null, parsed.id]
   );
 }
 

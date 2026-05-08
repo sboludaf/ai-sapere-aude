@@ -1248,6 +1248,26 @@ td {
   margin: 0;
 }
 
+.professor-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.professor-email a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.professor-email a:hover {
+  text-decoration: underline;
+}
+
+.edit-professor-wrapper .dropdown-panel {
+  right: auto;
+  left: -320px;
+}
+
 .delete-professor-button {
   align-items: center;
   background: transparent !important;

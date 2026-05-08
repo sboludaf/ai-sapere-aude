@@ -44,6 +44,7 @@ export type Professor = {
   lastName: string;
   email: string;
   phone?: string | null;
+  linkedin?: string | null;
   active: boolean;
   createdAt: string;
 };

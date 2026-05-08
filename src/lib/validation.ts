@@ -64,7 +64,17 @@ export const createProfessorSchema = z.object({
   firstName: z.string().trim().min(1, "Nombre obligatorio"),
   lastName: z.string().trim().min(1, "Apellidos obligatorios"),
   email: z.string().trim().email("Correo no valido"),
-  phone: z.preprocess(emptyToUndefined, z.string().trim().optional())
+  phone: z.preprocess(emptyToUndefined, z.string().trim().optional()),
+  linkedin: z.preprocess(emptyToUndefined, z.string().trim().url("URL de LinkedIn no valida").optional())
+});
+
+export const updateProfessorSchema = z.object({
+  id: z.string().uuid(),
+  firstName: z.string().trim().min(1, "Nombre obligatorio"),
+  lastName: z.string().trim().min(1, "Apellidos obligatorios"),
+  email: z.string().trim().email("Correo no valido"),
+  phone: z.preprocess(emptyToUndefined, z.string().trim().optional()),
+  linkedin: z.preprocess(emptyToUndefined, z.string().trim().url("URL de LinkedIn no valida").optional())
 });
 
 export const updateProposalClassSchema = z.object({

@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, Mail, Phone } from "lucide-react";
+import { ArrowLeft, Linkedin, Mail, Phone } from "lucide-react";
 import { DeleteProfessorButton } from "@/components/delete-professor-button";
+import { EditProfessorDropdown } from "@/components/edit-professor-dropdown";
 import { NewProfessorModal } from "@/components/new-professor-modal";
 import { listProfessors } from "@/lib/repositories/proposals";
 
@@ -47,8 +48,17 @@ export default async function ProfessorsPage() {
                     {professor.phone}
                   </p>
                 ) : null}
+                {professor.linkedin ? (
+                  <p className="professor-email">
+                    <Linkedin size={13} aria-hidden="true" />
+                    <a href={professor.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                  </p>
+                ) : null}
               </div>
-              <DeleteProfessorButton label={`Eliminar ${professor.firstName} ${professor.lastName}`} professorId={professor.id} />
+              <div className="professor-actions">
+                <EditProfessorDropdown professor={professor} />
+                <DeleteProfessorButton label={`Eliminar ${professor.firstName} ${professor.lastName}`} professorId={professor.id} />
+              </div>
             </article>
           ))}
         </div>
