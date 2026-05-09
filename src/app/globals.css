@@ -89,13 +89,21 @@ button:disabled {
 
 .brand-mark {
   align-items: center;
-  background: var(--primary);
+  background: #050506;
   border-radius: 8px;
-  color: var(--button-ink);
   display: inline-flex;
   height: 44px;
   justify-content: center;
+  overflow: hidden;
+  padding: 3px;
   width: 44px;
+}
+
+.brand-mark img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .brand strong,

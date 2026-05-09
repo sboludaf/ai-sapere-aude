@@ -1,6 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
-import { BrainCircuit, BriefcaseBusiness, GraduationCap } from "lucide-react";
+import { BriefcaseBusiness, GraduationCap } from "lucide-react";
 
 type AppShellProps = {
   children: ReactNode;
@@ -12,7 +13,7 @@ export function AppShell({ children }: AppShellProps) {
       <aside className="sidebar">
         <Link className="brand" href="/">
           <span className="brand-mark">
-            <BrainCircuit size={24} aria-hidden="true" />
+            <Image src="/brand-mark-white.png" alt="" aria-hidden="true" width={38} height={38} priority />
           </span>
           <span>
             <strong>AI Sapere Aude</strong>
