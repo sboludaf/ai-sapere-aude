@@ -112,8 +112,8 @@ export default async function ProposalPage({ params }: ProposalPageProps) {
         </Card.Content>
       </Card>
 
-      <section className="panel">
-        <div className="panel-header">
+      <section className="panel classes-panel">
+        <div className="panel-header classes-panel-header">
           <div>
             <h2>Clases y profesores</h2>
             <p className="subtle">{proposal.pendingClassCount} pendientes de asignar profesor</p>

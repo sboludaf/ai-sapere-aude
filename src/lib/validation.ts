@@ -81,8 +81,13 @@ export const updateProposalClassSchema = z.object({
   proposalId: z.string().uuid(),
   classId: z.string().uuid(),
   title: z.preprocess(emptyToUndefined, z.string().trim().min(1, "Titulo obligatorio").optional()),
-  professorId: z.preprocess(emptyToUndefined, z.string().trim().optional()),
-  classStatus: z.enum(classStatuses)
+  professorId: z.string().trim().optional(),
+  classDate: z.string().trim().min(1, "Fecha obligatoria").optional(),
+  startTime: z.string().trim().min(1, "Hora inicio obligatoria").optional(),
+  endTime: z.string().trim().min(1, "Hora fin obligatoria").optional(),
+  hours: z.coerce.number().positive("Horas obligatorias").optional(),
+  classStatus: z.enum(classStatuses).optional(),
+  notes: z.string().trim().optional()
 });
 
 export const createProposalClassSchema = z.object({

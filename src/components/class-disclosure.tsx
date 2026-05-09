@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input, TextArea } from "@heroui/react";
-import { CalendarPlus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { AppDatePicker, AppTimeField } from "@/components/app-controls";
 import { formatHours } from "@/lib/format";
 
@@ -72,10 +72,10 @@ export function ClassDisclosure({ proposalId }: ClassDisclosureProps) {
   }
 
   return (
-    <div className="disclosure">
+    <div className="disclosure class-disclosure">
       <Button className="brand-button" onPress={() => setIsOpen((current) => !current)}>
-        <CalendarPlus size={18} aria-hidden="true" />
-        Anadir clase
+        <Plus size={18} aria-hidden="true" />
+        <span className="class-add-label">Anadir clase</span>
       </Button>
       {isOpen ? (
         <form className="disclosure-panel stacked-form" onSubmit={submit}>
@@ -109,7 +109,7 @@ export function ClassDisclosure({ proposalId }: ClassDisclosureProps) {
           </label>
           {error ? <p className="form-error">{error}</p> : null}
           <Button className="brand-button" type="submit" isDisabled={isPending}>
-            <CalendarPlus size={18} aria-hidden="true" />
+            <Plus size={18} aria-hidden="true" />
             {isPending ? "Guardando..." : "Guardar clase"}
           </Button>
         </form>

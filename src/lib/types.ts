@@ -125,7 +125,12 @@ export type UpdateProposalClassInput = {
   classId: string;
   title?: string;
   professorId?: string;
-  classStatus: ClassStatus;
+  classDate?: string;
+  startTime?: string;
+  endTime?: string;
+  hours?: number;
+  classStatus?: ClassStatus;
+  notes?: string;
 };
 
 export type CreateProposalClassInput = {

@@ -1209,6 +1209,44 @@ textarea:focus {
   width: 100%;
 }
 
+.classes-manager {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.classes-mobile-list {
+  display: none;
+}
+
+.class-edit-desktop-panel {
+  display: block;
+}
+
+.class-edit-mobile-panel {
+  display: none;
+}
+
+.class-edit-panel {
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.class-edit-panel-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.class-edit-panel-header h3 {
+  font-size: 1rem;
+  margin: 0;
+}
+
 .app-table-root {
   display: block;
   max-width: 100%;
@@ -1297,7 +1335,7 @@ table {
 }
 
 .classes-table {
-  min-width: 780px;
+  min-width: 860px;
   table-layout: fixed;
 }
 
@@ -1320,12 +1358,12 @@ table {
 
 .classes-table th:nth-child(1),
 .classes-table td:nth-child(1) {
-  width: 30%;
+  width: 27%;
 }
 
 .classes-table th:nth-child(2),
 .classes-table td:nth-child(2) {
-  width: 11%;
+  width: 10%;
 }
 
 .classes-table th:nth-child(3),
@@ -1334,14 +1372,23 @@ table {
 .classes-table td:nth-child(4),
 .classes-table th:nth-child(5),
 .classes-table td:nth-child(5) {
-  width: 9%;
+  width: 8%;
 }
 
 .classes-table th:nth-child(6),
-.classes-table td:nth-child(6),
+.classes-table td:nth-child(6) {
+  width: 15%;
+}
+
 .classes-table th:nth-child(7),
 .classes-table td:nth-child(7) {
   width: 16%;
+}
+
+.classes-table th:nth-child(8),
+.classes-table td:nth-child(8) {
+  width: 8%;
+  text-align: center;
 }
 
 th,
@@ -1878,28 +1925,151 @@ td {
     z-index: 220;
   }
 
+  .classes-panel {
+    border-radius: 28px;
+    padding: 22px;
+  }
+
+  .classes-panel-header {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 16px;
+  }
+
+  .classes-panel-header h2 {
+    font-size: 1.7rem;
+    line-height: 1.05;
+  }
+
+  .classes-panel-header .subtle {
+    font-size: 1.1rem;
+    line-height: 1.25;
+  }
+
+  .classes-panel-header .class-disclosure {
+    flex-shrink: 0;
+    justify-items: end;
+    width: auto;
+  }
+
+  .classes-panel-header .class-disclosure .brand-button {
+    border-radius: 999px !important;
+    height: 68px !important;
+    min-height: 68px !important;
+    min-width: 68px !important;
+    padding: 0 !important;
+    width: 68px !important;
+  }
+
+  .classes-panel-header .class-disclosure .brand-button svg {
+    height: 30px;
+    width: 30px;
+  }
+
+  .class-add-label {
+    display: none;
+  }
+
   .classes-table-wrap {
-    margin-inline: -2px;
-    overflow-x: auto;
-    padding-bottom: 6px;
-    -webkit-overflow-scrolling: touch;
+    display: none;
   }
 
-  .classes-table {
-    min-width: 740px;
+  .class-edit-desktop-panel {
+    display: none;
   }
 
-  .classes-table th {
-    font-size: 0.54rem;
+  .class-edit-mobile-panel {
+    display: block;
+    margin-top: 10px;
   }
 
-  .classes-table td {
-    font-size: 0.66rem;
-    padding: 8px 6px;
+  .classes-mobile-list {
+    display: grid;
+    gap: 14px;
   }
 
-  .classes-table .editable-cell {
-    gap: 6px;
+  .class-session-card-wrap {
+    display: grid;
+    gap: 0;
+  }
+
+  .class-session-card {
+    background: #50555a;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 28px;
+    color: #ffffff;
+    display: grid;
+    gap: 12px;
+    padding: 16px 16px 12px;
+  }
+
+  .class-session-card-header {
+    align-items: flex-start;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: minmax(0, 1fr) 34px;
+  }
+
+  .class-session-card h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .class-card-edit-button {
+    background: transparent !important;
+    color: #070809 !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 !important;
+    width: 34px !important;
+  }
+
+  .class-session-meta {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    line-height: 1.15;
+  }
+
+  .class-session-meta-item {
+    align-items: center;
+    color: #ffffff;
+    display: inline-flex;
+    gap: 7px;
+    min-width: 0;
+  }
+
+  .class-session-meta-item svg {
+    color: #15181d;
+    flex-shrink: 0;
+    stroke-width: 2.3;
+  }
+
+  .class-session-status {
+    display: flex;
+    justify-content: center;
+  }
+
+  .class-session-card .class-status-badge {
+    font-size: 0.82rem;
+    font-weight: 500;
+    min-height: 34px;
+    padding: 8px 14px;
+  }
+
+  .class-edit-panel {
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  .class-edit-panel .form-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .icon-only {

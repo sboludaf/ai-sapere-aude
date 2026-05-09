@@ -772,9 +772,12 @@ export async function updateProposalBudget(input: UpdateBudgetInput) {
 export async function updateProposalClass(input: UpdateProposalClassInput) {
   await ensureApplicationSchema();
   const parsed = updateProposalClassSchema.parse(input);
+  const hasProfessorId = Object.prototype.hasOwnProperty.call(parsed, "professorId");
+  const hasNotes = Object.prototype.hasOwnProperty.call(parsed, "notes");
+  const hours = parsed.hours ?? (parsed.startTime && parsed.endTime ? calculateHours(parsed.startTime, parsed.endTime) : undefined);
   let professorName: string | null = null;
 
-  if (parsed.professorId) {
+  if (hasProfessorId && parsed.professorId) {
     const [professorRows] = await getPool().execute<Array<RowDataPacket & { firstName: string; lastName: string }>>(
       "SELECT first_name AS firstName, last_name AS lastName FROM professors WHERE id = ? LIMIT 1",
       [parsed.professorId]
@@ -786,11 +789,33 @@ export async function updateProposalClass(input: UpdateProposalClassInput) {
   await getPool().execute(
     `
     UPDATE proposal_professor_assignments
-    SET professor_id = ?, professor_name = ?, class_status = ?,
-        class_title = COALESCE(?, class_title)
+    SET professor_id = CASE WHEN ? THEN ? ELSE professor_id END,
+        professor_name = CASE WHEN ? THEN ? ELSE professor_name END,
+        class_status = COALESCE(?, class_status),
+        class_title = COALESCE(?, class_title),
+        session_date = COALESCE(?, session_date),
+        start_time = COALESCE(?, start_time),
+        end_time = COALESCE(?, end_time),
+        hours = COALESCE(?, hours),
+        notes = CASE WHEN ? THEN ? ELSE notes END
     WHERE id = ? AND proposal_id = ?
     `,
-    [parsed.professorId || null, professorName, parsed.classStatus, parsed.title ?? null, parsed.classId, parsed.proposalId]
+    [
+      hasProfessorId,
+      hasProfessorId ? parsed.professorId || null : null,
+      hasProfessorId,
+      hasProfessorId ? professorName : null,
+      parsed.classStatus ?? null,
+      parsed.title ?? null,
+      parsed.classDate ?? null,
+      parsed.startTime ?? null,
+      parsed.endTime ?? null,
+      hours ?? null,
+      hasNotes,
+      hasNotes ? parsed.notes || null : null,
+      parsed.classId,
+      parsed.proposalId
+    ]
   );
 
   await syncProposalById(parsed.proposalId);
