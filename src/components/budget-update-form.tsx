@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input } from "@heroui/react";
-import { Plus, Save, Trash2 } from "lucide-react";
+import { Plus, Save, Trash2, X } from "lucide-react";
 import { AppNumberField, AppSelect } from "@/components/app-controls";
 import { formatCurrency } from "@/lib/format";
 import { proposalResponsibles } from "@/lib/types";
@@ -13,6 +13,7 @@ type BudgetUpdateFormProps = {
   proposalId: string;
   currency: string;
   latestItems: BudgetItem[];
+  onCancel?: () => void;
   onSaved?: () => void;
 };
 
@@ -32,7 +33,7 @@ const emptyItem: BudgetDraft = {
   unitPrice: 0
 };
 
-export function BudgetUpdateForm({ proposalId, currency, latestItems, onSaved }: BudgetUpdateFormProps) {
+export function BudgetUpdateForm({ proposalId, currency, latestItems, onCancel, onSaved }: BudgetUpdateFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -88,7 +89,19 @@ export function BudgetUpdateForm({ proposalId, currency, latestItems, onSaved }:
   }
 
   return (
-    <form className="stacked-form" onSubmit={submit}>
+    <form className="stacked-form budget-update-form" onSubmit={submit}>
+      <div className="budget-update-form-header">
+        <div>
+          <h3>Modificar presupuesto</h3>
+          <p className="subtle">Parte de la version actual.</p>
+        </div>
+        {onCancel ? (
+          <Button type="button" isIconOnly aria-label="Cerrar edicion de presupuesto" className="edit-button" variant="outline" onPress={onCancel}>
+            <X size={15} aria-hidden="true" />
+          </Button>
+        ) : null}
+      </div>
+
       <div className="form-grid two compact-fields">
         <label>
           Motivo
@@ -125,39 +138,54 @@ export function BudgetUpdateForm({ proposalId, currency, latestItems, onSaved }:
 
       {items.map((item, index) => (
         <div className="row-grid budget-row" key={`budget-update-${index}`}>
-          <Input
-            aria-label="Servicio"
-            placeholder="Servicio"
-            value={item.serviceName}
-            onChange={(event) => updateItem(index, { serviceName: event.target.value })}
-          />
-          <Input
-            aria-label="Descripcion"
-            placeholder="Descripcion"
-            value={item.description}
-            onChange={(event) => updateItem(index, { description: event.target.value })}
-          />
-          <AppNumberField
-            ariaLabel="Tiempo o unidades"
-            minValue={0}
-            step={0.5}
-            value={item.quantity}
-            onChange={(value) => updateItem(index, { quantity: value })}
-          />
-          <AppNumberField
-            ariaLabel="Personas"
-            minValue={0}
-            step={1}
-            value={item.persons}
-            onChange={(value) => updateItem(index, { persons: value })}
-          />
-          <AppNumberField
-            ariaLabel="Precio unitario"
-            minValue={0}
-            step={50}
-            value={item.unitPrice}
-            onChange={(value) => updateItem(index, { unitPrice: value })}
-          />
+          <label className="budget-field">
+            <span className="budget-field-label">Servicio</span>
+            <Input
+              aria-label="Servicio"
+              placeholder="Servicio"
+              value={item.serviceName}
+              onChange={(event) => updateItem(index, { serviceName: event.target.value })}
+            />
+          </label>
+          <label className="budget-field">
+            <span className="budget-field-label">Descripcion</span>
+            <Input
+              aria-label="Descripcion"
+              placeholder="Descripcion"
+              value={item.description}
+              onChange={(event) => updateItem(index, { description: event.target.value })}
+            />
+          </label>
+          <label className="budget-field">
+            <span className="budget-field-label">Tiempo / unidades</span>
+            <AppNumberField
+              ariaLabel="Tiempo o unidades"
+              minValue={0}
+              step={0.5}
+              value={item.quantity}
+              onChange={(value) => updateItem(index, { quantity: value })}
+            />
+          </label>
+          <label className="budget-field">
+            <span className="budget-field-label">Personas</span>
+            <AppNumberField
+              ariaLabel="Personas"
+              minValue={0}
+              step={1}
+              value={item.persons}
+              onChange={(value) => updateItem(index, { persons: value })}
+            />
+          </label>
+          <label className="budget-field">
+            <span className="budget-field-label">Precio unitario</span>
+            <AppNumberField
+              ariaLabel="Precio unitario"
+              minValue={0}
+              step={0.5}
+              value={item.unitPrice}
+              onChange={(value) => updateItem(index, { unitPrice: value })}
+            />
+          </label>
           <Button
             type="button"
             isIconOnly

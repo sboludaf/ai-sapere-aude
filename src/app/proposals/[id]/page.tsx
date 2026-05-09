@@ -99,8 +99,8 @@ export default async function ProposalPage({ params }: ProposalPageProps) {
         />
       </section>
 
-      <Card className="panel">
-        <Card.Header className="panel-header">
+      <Card className="panel budget-panel">
+        <Card.Header className="panel-header budget-panel-header">
           <div>
             <h2>Servicios y presupuesto</h2>
             <p className="subtle">{latestBudget ? `Version ${latestBudget.versionNumber}` : "Sin presupuesto"}</p>

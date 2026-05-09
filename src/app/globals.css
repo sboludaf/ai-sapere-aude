@@ -1123,6 +1123,14 @@ textarea:focus {
   grid-template-columns: 1.1fr 1.5fr 0.55fr 0.48fr 0.75fr 42px;
 }
 
+.budget-field {
+  min-width: 0;
+}
+
+.budget-field-label {
+  display: none;
+}
+
 .assignment-row {
   grid-template-columns: 1fr 1fr 0.78fr 0.52fr 1.2fr 42px;
 }
@@ -1277,6 +1285,23 @@ textarea:focus {
 .budget-table {
   min-width: 660px;
   table-layout: fixed;
+}
+
+.budget-items {
+  display: grid;
+  min-width: 0;
+}
+
+.budget-table-wrap {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.budget-mobile-list {
+  display: none;
 }
 
 .budget-update-disclosure {
@@ -1892,24 +1917,261 @@ td {
     display: inline;
   }
 
+  .budget-panel {
+    border-radius: 28px;
+    padding: 22px;
+  }
+
+  .budget-panel-header {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 16px;
+  }
+
+  .budget-panel-header h2 {
+    font-size: 1.7rem;
+    line-height: 1.05;
+  }
+
+  .budget-panel-header .subtle {
+    font-size: 1.1rem;
+    line-height: 1.25;
+  }
+
+  .budget-panel-header .budget-update-disclosure {
+    flex-shrink: 0;
+    justify-items: end;
+    width: auto;
+  }
+
+  .budget-panel-header .budget-update-button {
+    border-radius: 999px !important;
+    color: #ffffff !important;
+    font-size: 1rem;
+    height: 68px !important;
+    line-height: 1;
+    min-height: 68px !important;
+    min-width: 68px !important;
+    padding: 0 !important;
+    width: 68px !important;
+  }
+
+  .budget-panel-header .budget-update-button svg {
+    height: 30px;
+    stroke-width: 2.2;
+    width: 30px;
+  }
+
+  .budget-panel-header .budget-update-label-desktop,
+  .budget-panel-header .budget-update-label-mobile {
+    display: none;
+  }
+
+  .budget-update-disclosure .disclosure-panel {
+    left: 18px;
+    max-height: calc(100dvh - 120px);
+    overflow-y: auto;
+    position: fixed;
+    right: 18px;
+    top: 84px;
+    width: auto;
+    z-index: 240;
+  }
+
   .budget-table-wrap {
-    margin-inline: -2px;
-    overflow-x: auto;
-    padding-bottom: 6px;
-    -webkit-overflow-scrolling: touch;
+    display: none;
   }
 
-  .budget-table {
-    min-width: 620px;
+  .budget-mobile-list {
+    display: grid;
+    gap: 14px;
   }
 
-  .budget-table th {
-    font-size: 0.54rem;
+  .budget-service-card {
+    background: #50555a;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 28px;
+    color: #ffffff;
+    display: grid;
+    gap: 16px;
+    padding: 16px;
   }
 
-  .budget-table td {
-    font-size: 0.66rem;
-    padding: 8px 6px;
+  .budget-service-copy {
+    min-width: 0;
+  }
+
+  .budget-service-card h3 {
+    font-size: 1.04rem;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .budget-service-card p {
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 0.9rem;
+    line-height: 1.25;
+    margin: 4px 0 0;
+    overflow-wrap: anywhere;
+  }
+
+  .budget-service-detail {
+    align-items: end;
+    display: grid;
+    gap: 14px;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .budget-service-metrics {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    min-width: 0;
+  }
+
+  .budget-service-meta {
+    align-items: center;
+    color: #ffffff;
+    display: inline-flex;
+    gap: 7px;
+    line-height: 1;
+  }
+
+  .budget-service-meta svg {
+    color: #050506;
+    flex-shrink: 0;
+    stroke-width: 2.3;
+  }
+
+  .budget-service-total {
+    color: #ffffff;
+    font-size: clamp(1.1rem, 6vw, 1.65rem);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 0.92;
+    white-space: nowrap;
+  }
+
+  .budget-mobile-total {
+    color: #ffffff;
+    display: block;
+    font-size: clamp(1.75rem, 8.5vw, 2.35rem);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1;
+    margin-top: 42px;
+    text-align: center;
+  }
+
+  .budget-update-form {
+    gap: 10px;
+  }
+
+  .budget-update-form-header {
+    align-items: flex-start;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+  }
+
+  .budget-update-form-header h3 {
+    color: var(--ink);
+    font-size: 0.98rem;
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  .budget-update-form-header .subtle {
+    font-size: 0.72rem;
+    line-height: 1.2;
+    margin-top: 3px;
+  }
+
+  .budget-update-form label {
+    font-size: 0.7rem;
+    gap: 5px;
+  }
+
+  .budget-update-form .compact-fields,
+  .budget-update-form .form-grid.two {
+    gap: 8px;
+  }
+
+  .budget-update-form input,
+  .budget-update-form .app-select-trigger,
+  .budget-update-form .app-number-group {
+    font-size: 0.78rem;
+    height: 36px !important;
+    max-height: 36px;
+    min-height: 36px !important;
+  }
+
+  .budget-update-form input {
+    padding: 7px 9px;
+  }
+
+  .budget-update-form .app-select-trigger {
+    padding: 0 9px;
+  }
+
+  .budget-update-form .app-number-input {
+    font-size: 0.78rem;
+    height: 34px;
+  }
+
+  .budget-update-form .app-number-stepper {
+    min-height: 34px;
+    width: 34px;
+  }
+
+  .budget-update-form .section-heading.compact {
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .budget-update-form .section-heading.compact strong {
+    font-size: 1rem;
+  }
+
+  .budget-update-form .section-heading.compact .secondary-button {
+    font-size: 0.78rem;
+    min-height: 36px;
+    padding: 7px 10px;
+  }
+
+  .budget-update-form .budget-helper {
+    display: none;
+  }
+
+  .budget-update-form .budget-row {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    gap: 8px;
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .budget-update-form .budget-field-label {
+    color: var(--muted);
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .budget-update-form .budget-row .icon-only {
+    justify-self: end;
+    min-height: 36px;
+    width: 36px;
+  }
+
+  .budget-update-form .brand-button {
+    font-size: 0.84rem;
+    min-height: 42px !important;
   }
 
   .disclosure-panel,
