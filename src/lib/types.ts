@@ -60,6 +60,7 @@ export type ProposalClass = {
   hours: number;
   classStatus: ClassStatus;
   notes?: string | null;
+  description?: string | null;
 };
 
 export type ProposalSummary = {
@@ -131,6 +132,7 @@ export type UpdateProposalClassInput = {
   hours?: number;
   classStatus?: ClassStatus;
   notes?: string;
+  description?: string;
 };
 
 export type CreateProposalClassInput = {

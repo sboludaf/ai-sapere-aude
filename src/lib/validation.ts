@@ -26,7 +26,8 @@ const proposalClassSchema = z.object({
   endTime: z.string().trim().min(1, "Hora fin obligatoria"),
   hours: z.coerce.number().positive("Horas obligatorias"),
   classStatus: z.enum(classStatuses).default("SEARCHING_PROFESSOR"),
-  notes: z.preprocess(emptyToUndefined, z.string().trim().optional())
+  notes: z.preprocess(emptyToUndefined, z.string().trim().optional()),
+  description: z.preprocess(emptyToUndefined, z.string().optional())
 });
 
 export const createProposalSchema = z.object({
@@ -87,7 +88,8 @@ export const updateProposalClassSchema = z.object({
   endTime: z.string().trim().min(1, "Hora fin obligatoria").optional(),
   hours: z.coerce.number().positive("Horas obligatorias").optional(),
   classStatus: z.enum(classStatuses).optional(),
-  notes: z.string().trim().optional()
+  notes: z.string().trim().optional(),
+  description: z.string().optional()
 });
 
 export const createProposalClassSchema = z.object({

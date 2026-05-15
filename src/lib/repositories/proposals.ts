@@ -59,6 +59,7 @@ type ProposalClassRow = RowDataPacket & {
   hours: number;
   classStatus: ClassStatus;
   notes: string | null;
+  description: string | null;
 };
 
 type CommentRow = RowDataPacket & ProposalComment;
@@ -291,6 +292,9 @@ async function ensureApplicationSchema() {
         `
       );
       await ignoreSchemaError(
+        "ALTER TABLE proposal_professor_assignments ADD COLUMN description MEDIUMTEXT NULL AFTER notes"
+      );
+      await ignoreSchemaError(
         `
         UPDATE proposal_professor_assignments
         SET
@@ -464,7 +468,8 @@ export async function getProposal(id: string): Promise<ProposalDetail | null> {
         end_time AS endTime,
         hours,
         class_status AS classStatus,
-        notes
+        notes,
+        description
       FROM proposal_professor_assignments
       WHERE proposal_id = ?
       ORDER BY session_date ASC, start_time ASC
@@ -578,7 +583,8 @@ export async function getProposal(id: string): Promise<ProposalDetail | null> {
         endTime: normalizeTime(classItem.endTime),
         hours: Number(classItem.hours),
         classStatus: classItem.classStatus,
-        notes: classItem.notes
+        notes: classItem.notes,
+        description: classItem.description
       })),
       comments: comments.map((comment) => ({
         id: comment.id,
@@ -647,9 +653,9 @@ export async function createProposal(input: CreateProposalInput) {
       await connection.execute(
         `
         INSERT INTO proposal_professor_assignments (
-          id, proposal_id, professor_id, class_title, professor_name, session_date, start_time, end_time, hours, class_status, notes
+          id, proposal_id, professor_id, class_title, professor_name, session_date, start_time, end_time, hours, class_status, notes, description
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `,
         [
           crypto.randomUUID(),
@@ -662,7 +668,8 @@ export async function createProposal(input: CreateProposalInput) {
           classItem.endTime,
           hours,
           classStatus,
-          classItem.notes || null
+          classItem.notes || null,
+          classItem.description || null
         ]
       );
     }
@@ -774,6 +781,7 @@ export async function updateProposalClass(input: UpdateProposalClassInput) {
   const parsed = updateProposalClassSchema.parse(input);
   const hasProfessorId = Object.prototype.hasOwnProperty.call(parsed, "professorId");
   const hasNotes = Object.prototype.hasOwnProperty.call(parsed, "notes");
+  const hasDescription = Object.prototype.hasOwnProperty.call(parsed, "description");
   const hours = parsed.hours ?? (parsed.startTime && parsed.endTime ? calculateHours(parsed.startTime, parsed.endTime) : undefined);
   let professorName: string | null = null;
 
@@ -797,7 +805,8 @@ export async function updateProposalClass(input: UpdateProposalClassInput) {
         start_time = COALESCE(?, start_time),
         end_time = COALESCE(?, end_time),
         hours = COALESCE(?, hours),
-        notes = CASE WHEN ? THEN ? ELSE notes END
+        notes = CASE WHEN ? THEN ? ELSE notes END,
+        description = CASE WHEN ? THEN ? ELSE description END
     WHERE id = ? AND proposal_id = ?
     `,
     [
@@ -813,6 +822,8 @@ export async function updateProposalClass(input: UpdateProposalClassInput) {
       hours ?? null,
       hasNotes,
       hasNotes ? parsed.notes || null : null,
+      hasDescription,
+      hasDescription ? parsed.description || null : null,
       parsed.classId,
       parsed.proposalId
     ]
@@ -830,9 +841,9 @@ export async function createProposalClass(input: CreateProposalClassInput) {
   await getPool().execute(
     `
     INSERT INTO proposal_professor_assignments (
-      id, proposal_id, professor_id, class_title, professor_name, session_date, start_time, end_time, hours, class_status, notes
+      id, proposal_id, professor_id, class_title, professor_name, session_date, start_time, end_time, hours, class_status, notes, description
     )
-    VALUES (?, ?, NULL, ?, NULL, ?, ?, ?, ?, 'SEARCHING_PROFESSOR', ?)
+    VALUES (?, ?, NULL, ?, NULL, ?, ?, ?, ?, 'SEARCHING_PROFESSOR', ?, NULL)
     `,
     [
       id,

@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition, type FormEvent } from "react";
+import { Fragment, useEffect, useMemo, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input, Table, TextArea } from "@heroui/react";
-import { CalendarDays, Check, Clock3, Pencil, Presentation, X } from "lucide-react";
+import { CalendarDays, Check, ChevronUp, Clock3, Eye, Pencil, Presentation, X } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { AppDatePicker, AppSelect, AppTimeField } from "@/components/app-controls";
 import { formatClassStatus, formatDate, formatHours } from "@/lib/format";
 import { classStatuses, type ClassStatus, type Professor, type ProposalClass } from "@/lib/types";
@@ -23,6 +25,7 @@ type ClassFormValues = {
   hours: number;
   classStatus: ClassStatus;
   notes: string;
+  description: string;
 };
 
 function professorFullName(professor: Professor) {
@@ -51,6 +54,7 @@ export function ClassesTable({ proposalId, classes, professors }: ClassesTablePr
   const [rows, setRows] = useState(classes);
   const [editingClassId, setEditingClassId] = useState<string | null>(null);
   const [pendingClassId, setPendingClassId] = useState<string | null>(null);
+  const [expandedClassId, setExpandedClassId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const professorOptions = [
     { key: unassignedProfessorKey, label: "Pendiente de asignar profesor" },
@@ -83,7 +87,8 @@ export function ClassesTable({ proposalId, classes, professors }: ClassesTablePr
         endTime: values.endTime,
         hours: values.hours,
         classStatus: values.classStatus,
-        notes: values.notes
+        notes: values.notes,
+        description: values.description
       })
     });
 
@@ -107,7 +112,8 @@ export function ClassesTable({ proposalId, classes, professors }: ClassesTablePr
               endTime: values.endTime,
               hours: values.hours,
               classStatus: values.classStatus,
-              notes: values.notes || null
+              notes: values.notes || null,
+              description: values.description || null
             }
           : row
       )
@@ -119,6 +125,10 @@ export function ClassesTable({ proposalId, classes, professors }: ClassesTablePr
 
   function toggleEditor(classId: string) {
     setEditingClassId((current) => (current === classId ? null : classId));
+  }
+
+  function toggleExpanded(classId: string) {
+    setExpandedClassId((current) => (current === classId ? null : classId));
   }
 
   return (
@@ -134,37 +144,62 @@ export function ClassesTable({ proposalId, classes, professors }: ClassesTablePr
               <Table.Column>Horas totales</Table.Column>
               <Table.Column>Profesor</Table.Column>
               <Table.Column>Estado Clase</Table.Column>
+              <Table.Column>Detalle</Table.Column>
               <Table.Column>Editar</Table.Column>
             </Table.Header>
             <Table.Body>
               {rows.map((classItem) => {
                 const classId = classItem.id ?? "";
+                const isExpanded = expandedClassId === classId;
 
                 return (
-                  <Table.Row key={classId || `${classItem.title}-${classItem.classDate}`}>
-                    <Table.Cell data-label="Titulo">{classItem.title}</Table.Cell>
-                    <Table.Cell data-label="Fecha">{formatDate(classItem.classDate)}</Table.Cell>
-                    <Table.Cell data-label="Hora Inicio">{classItem.startTime}</Table.Cell>
-                    <Table.Cell data-label="Hora Fin">{classItem.endTime}</Table.Cell>
-                    <Table.Cell data-label="Horas totales">{formatHours(classItem.hours)}</Table.Cell>
-                    <Table.Cell data-label="Profesor">{classItem.professorName ?? "Pendiente de asignar profesor"}</Table.Cell>
-                    <Table.Cell data-label="Estado Clase">
-                      <span className={`class-status-badge ${classStatusTone[classItem.classStatus]}`}>{formatClassStatus(classItem.classStatus)}</span>
-                    </Table.Cell>
-                    <Table.Cell data-label="Editar">
-                      {classId ? (
-                        <Button
-                          isIconOnly
-                          aria-label={`Editar ${classItem.title}`}
-                          className="edit-button"
-                          variant="outline"
-                          onPress={() => toggleEditor(classId)}
-                        >
-                          <Pencil size={14} aria-hidden="true" />
-                        </Button>
-                      ) : null}
-                    </Table.Cell>
-                  </Table.Row>
+                  <Fragment key={classId || `${classItem.title}-${classItem.classDate}`}>
+                    <Table.Row>
+                      <Table.Cell data-label="Titulo">{classItem.title}</Table.Cell>
+                      <Table.Cell data-label="Fecha">{formatDate(classItem.classDate)}</Table.Cell>
+                      <Table.Cell data-label="Hora Inicio">{classItem.startTime}</Table.Cell>
+                      <Table.Cell data-label="Hora Fin">{classItem.endTime}</Table.Cell>
+                      <Table.Cell data-label="Horas totales">{formatHours(classItem.hours)}</Table.Cell>
+                      <Table.Cell data-label="Profesor">{classItem.professorName ?? "Pendiente de asignar profesor"}</Table.Cell>
+                      <Table.Cell data-label="Estado Clase">
+                        <span className={`class-status-badge ${classStatusTone[classItem.classStatus]}`}>{formatClassStatus(classItem.classStatus)}</span>
+                      </Table.Cell>
+                      <Table.Cell data-label="Detalle">
+                        {classId ? (
+                          <Button
+                            isIconOnly
+                            aria-label={`Ver detalle de ${classItem.title}`}
+                            aria-expanded={isExpanded}
+                            className="edit-button"
+                            variant="outline"
+                            onPress={() => toggleExpanded(classId)}
+                          >
+                            <Eye size={14} aria-hidden="true" />
+                          </Button>
+                        ) : null}
+                      </Table.Cell>
+                      <Table.Cell data-label="Editar">
+                        {classId ? (
+                          <Button
+                            isIconOnly
+                            aria-label={`Editar ${classItem.title}`}
+                            className="edit-button"
+                            variant="outline"
+                            onPress={() => toggleEditor(classId)}
+                          >
+                            <Pencil size={14} aria-hidden="true" />
+                          </Button>
+                        ) : null}
+                      </Table.Cell>
+                    </Table.Row>
+                    {isExpanded ? (
+                      <Table.Row className="class-detail-row">
+                        <Table.Cell colSpan={9}>
+                          <ClassMarkdownPanel description={classItem.description} />
+                        </Table.Cell>
+                      </Table.Row>
+                    ) : null}
+                  </Fragment>
                 );
               })}
             </Table.Body>
@@ -189,23 +224,38 @@ export function ClassesTable({ proposalId, classes, professors }: ClassesTablePr
         {rows.map((classItem) => {
           const classId = classItem.id ?? "";
           const isEditing = editingClassId === classId;
+          const isExpanded = expandedClassId === classId;
 
           return (
             <article className="class-session-card-wrap" key={classId || `${classItem.title}-${classItem.classDate}-card`}>
               <div className="class-session-card">
                 <div className="class-session-card-header">
                   <h3>{classItem.title}</h3>
-                  {classId ? (
-                    <Button
-                      isIconOnly
-                      aria-label={`Editar ${classItem.title}`}
-                      className="class-card-edit-button"
-                      variant="ghost"
-                      onPress={() => toggleEditor(classId)}
-                    >
-                      <Pencil size={21} aria-hidden="true" />
-                    </Button>
-                  ) : null}
+                  <div className="class-card-actions">
+                    {classId ? (
+                      <Button
+                        isIconOnly
+                        aria-label={`Ver detalle de ${classItem.title}`}
+                        aria-expanded={isExpanded}
+                        className="class-card-edit-button"
+                        variant="ghost"
+                        onPress={() => toggleExpanded(classId)}
+                      >
+                        {isExpanded ? <ChevronUp size={21} aria-hidden="true" /> : <Eye size={21} aria-hidden="true" />}
+                      </Button>
+                    ) : null}
+                    {classId ? (
+                      <Button
+                        isIconOnly
+                        aria-label={`Editar ${classItem.title}`}
+                        className="class-card-edit-button"
+                        variant="ghost"
+                        onPress={() => toggleEditor(classId)}
+                      >
+                        <Pencil size={21} aria-hidden="true" />
+                      </Button>
+                    ) : null}
+                  </div>
                 </div>
                 <div className="class-session-meta">
                   <span className="class-session-meta-item">
@@ -224,6 +274,11 @@ export function ClassesTable({ proposalId, classes, professors }: ClassesTablePr
                 <div className="class-session-status">
                   <span className={`class-status-badge ${classStatusTone[classItem.classStatus]}`}>{formatClassStatus(classItem.classStatus)}</span>
                 </div>
+                {isExpanded ? (
+                  <div className="class-detail-mobile-panel">
+                    <ClassMarkdownPanel description={classItem.description} />
+                  </div>
+                ) : null}
               </div>
               {isEditing ? (
                 <div className="class-edit-mobile-panel">
@@ -254,6 +309,22 @@ type ClassEditFormProps = {
   onSave: (values: ClassFormValues) => Promise<string | null>;
 };
 
+function ClassMarkdownPanel({ description }: { description?: string | null }) {
+  const content = description?.trim();
+
+  return (
+    <div className="class-markdown-panel" role="region" aria-label="Detalle de la clase">
+      {content ? (
+        <div className="class-markdown-content">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+        </div>
+      ) : (
+        <p className="class-markdown-empty subtle">Sin descripcion. Edita la clase para anadir contenido en Markdown.</p>
+      )}
+    </div>
+  );
+}
+
 function ClassEditForm({ classItem, isPending, professorOptions, statusOptions, onCancel, onSave }: ClassEditFormProps) {
   const [title, setTitle] = useState(classItem.title);
   const [professorId, setProfessorId] = useState(classItem.professorId ?? unassignedProfessorKey);
@@ -262,6 +333,7 @@ function ClassEditForm({ classItem, isPending, professorOptions, statusOptions, 
   const [endTime, setEndTime] = useState(classItem.endTime);
   const [classStatus, setClassStatus] = useState<ClassStatus>(classItem.classStatus);
   const [notes, setNotes] = useState(classItem.notes ?? "");
+  const [description, setDescription] = useState(classItem.description ?? "");
   const [error, setError] = useState<string | null>(null);
   const hours = useMemo(() => calculateHours(startTime, endTime), [startTime, endTime]);
 
@@ -273,6 +345,7 @@ function ClassEditForm({ classItem, isPending, professorOptions, statusOptions, 
     setEndTime(classItem.endTime);
     setClassStatus(classItem.classStatus);
     setNotes(classItem.notes ?? "");
+    setDescription(classItem.description ?? "");
     setError(null);
   }, [classItem]);
 
@@ -298,7 +371,8 @@ function ClassEditForm({ classItem, isPending, professorOptions, statusOptions, 
       endTime,
       hours,
       classStatus,
-      notes: notes.trim()
+      notes: notes.trim(),
+      description
     });
 
     if (result) {
@@ -360,6 +434,17 @@ function ClassEditForm({ classItem, isPending, professorOptions, statusOptions, 
       <label>
         Notas
         <TextArea value={notes} disabled={isPending} placeholder="Contenido o foco de la clase" onChange={(event) => setNotes(event.target.value)} />
+      </label>
+      <label>
+        Descripcion (Markdown)
+        <TextArea
+          value={description}
+          disabled={isPending}
+          placeholder={"# Titulo\n\nContenido en **Markdown**..."}
+          rows={8}
+          className="class-description-textarea"
+          onChange={(event) => setDescription(event.target.value)}
+        />
       </label>
       {error ? <p className="form-error">{error}</p> : null}
       <div className="form-actions">

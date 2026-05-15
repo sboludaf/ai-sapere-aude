@@ -2277,7 +2277,11 @@ td {
     align-items: flex-start;
     display: grid;
     gap: 10px;
-    grid-template-columns: minmax(0, 1fr) 34px;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .class-session-card-header .class-card-actions {
+    flex-shrink: 0;
   }
 
   .class-session-card h3 {
@@ -2290,7 +2294,7 @@ td {
 
   .class-card-edit-button {
     background: transparent !important;
-    color: #070809 !important;
+    color: #ffffff !important;
     height: 34px !important;
     min-height: 34px !important;
     min-width: 34px !important;
@@ -2589,5 +2593,153 @@ td {
 
   .cal-detail div:first-child {
     grid-column: 1 / -1;
+  }
+}
+
+/* Class detail markdown panel */
+.class-detail-row > td,
+.class-detail-row > th {
+  background: #f8f9fb;
+  padding: 0 !important;
+}
+
+.class-markdown-panel {
+  padding: 16px 18px;
+  background: #f7f7fb;
+  border-radius: 12px;
+  border: 1px solid #e6e6ee;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+
+.class-detail-row .class-markdown-panel {
+  margin: 8px 6px;
+}
+
+.class-markdown-empty {
+  margin: 0;
+}
+
+.class-markdown-content {
+  line-height: 1.55;
+  color: #1f2330;
+  word-break: break-word;
+}
+
+.class-markdown-content h1,
+.class-markdown-content h2,
+.class-markdown-content h3,
+.class-markdown-content h4 {
+  margin: 0.6em 0 0.3em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.class-markdown-content h1 { font-size: 1.4rem; }
+.class-markdown-content h2 { font-size: 1.2rem; }
+.class-markdown-content h3 { font-size: 1.05rem; }
+.class-markdown-content h4 { font-size: 0.95rem; }
+
+.class-markdown-content p {
+  margin: 0.4em 0;
+}
+
+.class-markdown-content ul,
+.class-markdown-content ol {
+  margin: 0.4em 0 0.4em 1.2em;
+  padding: 0;
+}
+
+.class-markdown-content li {
+  margin: 0.15em 0;
+}
+
+.class-markdown-content a {
+  color: #4956ff;
+  text-decoration: underline;
+}
+
+.class-markdown-content code {
+  background: rgba(120, 130, 160, 0.12);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.92em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.class-markdown-content pre {
+  background: #11141d;
+  color: #f5f6fa;
+  padding: 12px 14px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  margin: 0.6em 0;
+}
+
+.class-markdown-content pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.class-markdown-content blockquote {
+  margin: 0.6em 0;
+  padding: 6px 12px;
+  border-left: 3px solid #4956ff;
+  background: rgba(73, 86, 255, 0.06);
+  border-radius: 0 6px 6px 0;
+  color: inherit;
+}
+
+.class-markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+  margin: 0.6em 0;
+}
+
+.class-markdown-content th,
+.class-markdown-content td {
+  border: 1px solid #e3e3ee;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.class-markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.class-markdown-content hr {
+  border: none;
+  border-top: 1px solid #e3e3ee;
+  margin: 1em 0;
+}
+
+.class-card-actions {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.class-detail-mobile-panel {
+  margin-top: 12px;
+}
+
+.class-description-textarea textarea,
+.class-description-textarea {
+  min-height: 180px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .class-markdown-panel {
+    padding: 14px;
+    font-size: 0.95rem;
   }
 }
